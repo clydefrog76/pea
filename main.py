@@ -458,9 +458,12 @@ class Window(Frame):
         if str(self.portbutton["text"]) == "Open Port":
             if self.commandsList:
                 self.portbutton.config(text="Close Port")
-
+                
                 newport = int(self.portentry.get())
                 self.port["listen"] = newport
+
+                msg = "Port {} is open".format(newport)
+                self.terminalFunction("--", None, msg)
 
                 self.portentry.delete(0, END)
                 self.portentry.insert(0, str(self.port["listen"]))
@@ -479,6 +482,9 @@ class Window(Frame):
                 self.terminalFunction("--", None, msg)
 
         elif str(self.portbutton["text"]) == "Close Port":
+            msg = "Port is closed"
+            self.terminalFunction("--", None, msg)            
+
             self.portentry.config(state="normal")
             self.portbutton.config(text="Open Port")
             self.socket.close()
