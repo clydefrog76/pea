@@ -1,6 +1,6 @@
 from threading import Thread
 import tkinter.ttk as ttk
-from tkinter import Tk, messagebox, Text, Frame, Menu, PhotoImage, BOTH, LEFT, RIGHT, END
+from tkinter import Tk, messagebox, Text, Frame, Menu, PhotoImage, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Toplevel, StringVar
 from tkinter.filedialog import askopenfilename
 import os, socket, sys, json, time, ast, datetime
 
@@ -359,18 +359,98 @@ class Window(Frame):
         except TclError:
             print(" - rClickbinder, something wrong")
 
+    def filterWindow(self):
+        """ opens a new filter window """
 
+        self.filterbutton.config(state="disabled")
 
+        def on_filterclosing():
+            """ kills the filter window """
 
+            self.filterbutton.config(state="normal")
+            filterWindow.destroy()
 
+        filterWindow = Toplevel()
+        filterWindow.wm_title("Filter")
+        filterWindow.pack_propagate(True)
+        filterWindow.protocol("WM_DELETE_WINDOW", on_filterclosing)
 
+        functionframe = ttk.LabelFrame(filterWindow, text="Filter Setup")
+        functionframe.pack(fill=BOTH, padx=5, pady=5, side=TOP)
 
+        resetfilterbutton = ttk.Button(
+            functionframe, text="Reset", width=10, command=self.resetfilterFunction
+        )
+        resetfilterbutton.pack(padx=5, pady=5, side=LEFT)
 
+        self.filterentry1 = ttk.Entry(functionframe, width=49)
+        self.filterentry1.insert(0, "")
+        self.filterentry1.pack(padx=5, pady=5, side=LEFT)
 
+        self.filtervar = StringVar()
+        filteroptions = ["AND", "OR"]
+        self.filterword = ttk.OptionMenu(
+            functionframe, self.filtervar, filteroptions[0], *filteroptions
+        )
+        self.filterword.config(width=7)
+        self.filterword.pack(padx=5, pady=5, side=LEFT)
 
+        self.filterentry2 = ttk.Entry(functionframe, width=49)
+        self.filterentry2.insert(0, "")
+        self.filterentry2.pack(padx=5, pady=5, side=LEFT)
 
+        refreshbutton = ttk.Button(
+            functionframe, text="Apply", width=10, command=self.refreshFunction
+        )
+        refreshbutton.pack(padx=5, pady=5, side=LEFT)
 
+        filterframe = ttk.LabelFrame(filterWindow, text="Filtered Terminal")
+        filterframe.pack(fill=BOTH, padx=5, pady=5, side=BOTTOM)
 
+        self.filterbox = Text(filterframe, width=120, height=20)
+        self.filterbox.config(font=("consolas", 10), undo=True, wrap="word")
+        self.filterbox.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
+        self.filterbox.bind("<Button-3>", self.rClicker, add="")
+
+        filterscrollb = ttk.Scrollbar(filterframe, command=self.filterbox.yview)
+        filterscrollb.grid(row=0, column=1, sticky="nsew")
+        self.filterbox["yscrollcommand"] = filterscrollb.set
+
+        filterWindow.resizable(width=False, height=False)
+
+        self.refreshFunction()   
+
+    def resetfilterFunction(self):
+        """ clears the filter entry field """
+
+        self.filterentry1.delete(0, END)
+        self.filterentry2.delete(0, END)
+        self.filtervar.set("AND")
+        self.refreshFunction()
+
+    def refreshFunction(self):
+        """ refresh the filter box """
+
+        self.filterbox.delete(1.0, END)
+
+        filterword1 = self.filterentry1.get()
+        filterword2 = self.filterentry2.get()
+
+        if len(filterword1) > 0 and len(filterword2) == 0:
+            for line in self.terminalbox.get("1.0", "end-1c").splitlines():
+                if filterword1 in line:
+                    self.filterbox.insert(END, "{}\n".format(line))
+        elif len(filterword1) > 0 and len(filterword2) > 0:
+            for line in self.terminalbox.get("1.0", "end-1c").splitlines():
+                if self.filtervar.get() == "AND":
+                    if filterword1 in line and filterword2 in line:
+                        self.filterbox.insert(END, "{}\n".format(line))
+                elif self.filtervar.get() == "OR":
+                    if filterword1 in line or filterword2 in line:
+                        self.filterbox.insert(END, "{}\n".format(line))
+        else:
+            for line in self.terminalbox.get("1.0", "end-1c").splitlines():
+                self.filterbox.insert(END, "{}\n".format(line))
 
     def listenFunction(self):
         """ gets trigger from Open Port button or the file loader """
