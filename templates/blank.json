@@ -4,7 +4,7 @@
     {"Category":"Basic Example"},
     {"Version":"1_0_0_0"},
     {"Port":1024},
-    {"Delay":0.5},
+    {"Delay":0.2},
     {"Script":false},
     [
         {"Description":"ON_CONNECT", "Query":"ON_CONNECT", "Response":"Welcome to PEA, the Python Emulator for Audiovisual devices.\r"},        

@@ -1,6 +1,6 @@
 from threading import Thread
 import tkinter.ttk as ttk
-from tkinter import Tk, messagebox, Text, Frame, Menu, PhotoImage, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Toplevel, StringVar
+from tkinter import Tk, messagebox, Text, Frame, Menu, PhotoImage, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Toplevel, StringVar, TclError
 from tkinter.filedialog import askopenfilename
 import os, socket, sys, json, time, ast, datetime
 
@@ -33,7 +33,7 @@ class Window(Frame):
         editmenu.add_command(label="Emulator JSON Editor", command=self.hello)
         editmenu.add_separator()
         editmenu.add_command(label="Emulator Script Editor", command=self.hello)
-        menubar.add_cascade(label="File", menu=editmenu)        
+        menubar.add_cascade(label="Edit", menu=editmenu)        
 
         toolsmenu = Menu(menubar, tearoff=0)
         toolsmenu.add_command(label="HEX - ASCII Converter", command=self.hello)
