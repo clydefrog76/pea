@@ -1,3 +1,17 @@
+"""
+    PEA
+
+    PEA is a Python Emulator for Audiovisual devices written to aid
+    in the develpment and testing of Audiovisual control projects.
+
+    Code by: 
+        Alex Teusch - alexander.teusch@gmail.com
+        Rupert Powell - rupert@astronoscope.eu
+
+    Version controlled here:
+        https://github.com/clydefrog76/pea
+"""
+
 from threading import Thread
 import tkinter.ttk as ttk
 from tkinter import Tk, messagebox, Text, Frame, Menu, PhotoImage, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Toplevel, StringVar, TclError
@@ -92,7 +106,7 @@ class Window(Frame):
         sendlabel = ttk.Label(sendframe, text="String")
         sendlabel.pack(padx=5, pady=5, side=LEFT)
         self.sendentry = ttk.Entry(sendframe, width=50)
-        self.sendentry.insert(0, "Enter ASCII direct or HEX strings with prefix \\\\x")
+        self.sendentry.insert(0, "Enter ASCII strings or HEX bytes with prefix \\x")
         self.sendentry.pack(padx=5, pady=5, side=LEFT)        
         self.sendbutton = ttk.Button(sendframe,
             text="Send", width=13,
@@ -100,6 +114,43 @@ class Window(Frame):
         )
         self.sendbutton.pack(padx=5, pady=5, side=LEFT)
         self.sendbutton.config(state="disabled")
+
+        scriptframe = ttk.LabelFrame(mainframe2, text="Script Function Buttons",)
+        scriptframe.grid(row=0, column=1, padx=8, pady=8, sticky='nsew')
+        self.scriptbutton1 = ttk.Button(scriptframe,
+            text="Func 1", width=11,
+            command=lambda i=1: self.callCustomFunc(i),
+        )
+        self.scriptbutton1.pack(padx=5, pady=5, side=LEFT)
+        self.scriptbutton1.config(state="disabled")     
+
+        self.scriptbutton2 = ttk.Button(scriptframe,
+            text="Func 2", width=11,
+            command=lambda i=2: self.callCustomFunc(i),
+        )
+        self.scriptbutton2.pack(padx=5, pady=5, side=LEFT)
+        self.scriptbutton2.config(state="disabled")
+
+        self.scriptbutton3 = ttk.Button(scriptframe,
+            text="Func 3", width=11,
+            command=lambda i=3: self.callCustomFunc(i),
+        )
+        self.scriptbutton3.pack(padx=5, pady=5, side=LEFT)
+        self.scriptbutton3.config(state="disabled") 
+
+        self.scriptbutton4 = ttk.Button(scriptframe,
+            text="Func4", width=11,
+            command=lambda i=4: self.callCustomFunc(i),
+        )
+        self.scriptbutton4.pack(padx=5, pady=5, side=LEFT)
+        self.scriptbutton4.config(state="disabled") 
+
+        self.scriptbutton5 = ttk.Button(scriptframe,
+            text="Func 5", width=11,
+            command=lambda i=5: self.callCustomFunc(i),
+        )
+        self.scriptbutton5.pack(padx=5, pady=5, side=LEFT)
+        self.scriptbutton5.config(state="disabled")                                  
 
         # terminal commands grid section --------------------------------------
 
@@ -220,27 +271,28 @@ class Window(Frame):
                     )
                     self.terminalFunction("--", None, msg)
 
-                    if data[6][
-                        "Script"
-                    ]:  # If a script is specified then also open that
-
-                        print(scriptName)
+                    if data[6]["Script"]:  # If a script is specified then also open that
                         msg = "Importing Script file: {}.py".format(scriptName)
                         self.terminalFunction("--", None, msg)
                         sys.path.append("{}".format(path))
                         try:
                             self.devscript = __import__(scriptName)
                         except Exception as e:
-                            msg = "Script Import Failled: {}.py".format(e)
+                            msg = "Script import failed: {}.py".format(e)
                             self.terminalFunction("--", None, msg)
                     else:
                         self.devscript = None
-
-                    print(self.commandsList)
-
         except Exception as e:
             print("Error opening sim file:", e) 
-   
+
+    def disconnectFunction(self):
+        """ declare the function when pressed on the disconnect button """
+
+        self.buffer = b""
+        if self.conn:
+            self.conn.close()
+            self.conn = None
+
     def sendFunction(self):
         """ sends a custom string defined in the code entry field """
 
@@ -251,13 +303,27 @@ class Window(Frame):
             self.terminalFunction("OU", port, sendbyte)
             self.conn.send(sendbyte)
 
-    def disconnectFunction(self):
-        """ declare the function when pressed on the disconnect button """
+    def callCustomFunc(self, func):
+        """ sends a custom data function """
 
-        self.buffer = b""
-        if self.conn:
-            self.conn.close()
-            self.conn = None
+        byteresponse = None
+        
+        if self.devscript:
+            try:
+                byteresponse = self.devscript.customFunc(func)
+            except Exception as e:
+                print('Exception occured in customFunc', e)            
+
+            if byteresponse and self.conn:
+                byteresponsesend = (
+                    byteresponse.encode("latin-1")
+                    .decode("unicode_escape")
+                    .encode("latin-1")
+                )
+
+                port = self.port["connected"]
+                self.terminalFunction("OU", port, byteresponsesend)
+                self.conn.send(byteresponsesend)            
 
     def terminalFunction(self, direction, port, data):
         """ function for printing to the terminal window """
