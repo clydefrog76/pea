@@ -16,7 +16,7 @@ from threading import Thread
 import tkinter.ttk as ttk
 from tkinter import Tk, messagebox, Text, Frame, Menu, PhotoImage, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Toplevel, StringVar, TclError
 from tkinter.filedialog import askopenfilename
-import os, socket, sys, json, time, ast, datetime
+import os, socket, sys, json, time, ast, datetime, binascii
 
 class Window(Frame):
     def __init__(self, master=None):
@@ -52,7 +52,7 @@ class Window(Frame):
         menubar.add_cascade(label="Edit", menu=editmenu)        
 
         toolsmenu = Menu(menubar, tearoff=0)
-        toolsmenu.add_command(label="HEX - ASCII Converter", command=self.hello)
+        toolsmenu.add_command(label="ASCII - HEX Conversion", command=lambda: self.asciihexWindow())
         menubar.add_cascade(label="Tools", menu=toolsmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
@@ -709,6 +709,53 @@ class Window(Frame):
         self.socket = None
 
         self.running = True
+
+    def asciihexWindow(self):
+        """ opens a new ASCII HEX window """
+
+        def on_asciihexclosing():
+            """ kills the ASCII HEX window """
+
+            asciihexWindow.destroy()
+
+        def asciihexFunction():
+            hexvar = "".join("{:02x}".format(ord(c)) for c in asciientry.get())
+            hexoutput.delete(0, END)
+            hexoutput.insert(0, hexvar)   
+
+        def hexasciiFunction():
+            asciivar = binascii.unhexlify(hexentry.get())
+            asciioutput.delete(0, END)
+            asciioutput.insert(0, asciivar)                   
+
+        asciihexWindow = Toplevel()
+        asciihexWindow.wm_title("ASCII - HEX Conversion")
+        asciihexWindow.pack_propagate(True)
+        asciihexWindow.protocol("WM_DELETE_WINDOW", on_asciihexclosing)
+
+        convframe1 = ttk.LabelFrame(asciihexWindow, text="ASCII to HEX",)
+        convframe1.grid(row=0, column=0, padx=8, pady=8, sticky='nsew')       
+        asciientry = ttk.Entry(convframe1, width=20, justify='center')
+        asciientry.pack(padx=5, pady=5, side=LEFT) 
+        hexoutput = ttk.Entry(convframe1, width=20, justify='center')
+        hexoutput.pack(padx=5, pady=5, side=LEFT) 
+        convbutton1 = ttk.Button(convframe1,
+            text="Convert", width=13,
+            command=lambda: asciihexFunction(),
+        )
+        convbutton1.pack(padx=5, pady=5, side=LEFT)       
+
+        convframe2 = ttk.LabelFrame(asciihexWindow, text="HEX to ASCII",)
+        convframe2.grid(row=1, column=0, padx=8, pady=8, sticky='nsew')       
+        hexentry = ttk.Entry(convframe2, width=20, justify='center')
+        hexentry.pack(padx=5, pady=5, side=LEFT) 
+        asciioutput = ttk.Entry(convframe2, width=20, justify='center')
+        asciioutput.pack(padx=5, pady=5, side=LEFT) 
+        convbutton2 = ttk.Button(convframe2,
+            text="Convert", width=13,
+            command=lambda: hexasciiFunction(),
+        )
+        convbutton2.pack(padx=5, pady=5, side=LEFT)                   
 
 def on_closing():
     """ closes the main window and kills the proces / task """
