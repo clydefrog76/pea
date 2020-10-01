@@ -1,5 +1,5 @@
 """
-    PEA
+    #PEA
 
     PEA is a Python Emulator for Audiovisual devices written to aid
     in the develpment and testing of Audiovisual control projects.
@@ -37,6 +37,7 @@ class Window(Frame):
         self.devscript = None
 
         # menu bar section ----------------------------------------------------
+
         menubar = Menu(root)
         filemenu = Menu(menubar, tearoff=0)
         filemenu.add_command(label="Browse for Emulator JSON File", command=lambda: self.browseFunction())
@@ -102,7 +103,7 @@ class Window(Frame):
         mainframe2 = ttk.Frame(self)
         mainframe2.grid(row=1, column=0, padx=0, pady=0, sticky='nsew')
 
-        sendframe = ttk.LabelFrame(mainframe2, text="Send Command",)
+        sendframe = ttk.LabelFrame(mainframe2, text="Send Quick Command",)
         sendframe.grid(row=0, column=0, padx=8, pady=8, sticky='nsew')
         sendlabel = ttk.Label(sendframe, text="String")
         sendlabel.pack(padx=5, pady=5, side=LEFT)
@@ -337,7 +338,7 @@ class Window(Frame):
 
         if self.terminalrunning:
             msgdir = str(direction)
-            msgport = str(port)
+            #msgport = str(port)
             now = datetime.datetime.now()
             msgnow = str(now.strftime("%H:%M:%S.%f")[:-3])
             msgdata = str(data)
