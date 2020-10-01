@@ -712,7 +712,7 @@ class Window(Frame):
 
     def asciihexWindow(self):
         """ opens a new ASCII HEX window """
-
+         
         def on_asciihexclosing():
             """ kills the ASCII HEX window """
 
