@@ -53,12 +53,15 @@ class Window(Frame):
 
         toolsmenu = Menu(menubar, tearoff=0)
         toolsmenu.add_command(label="ASCII - HEX Converter", command=lambda: self.asciihexWindow())
+        toolsmenu.add_separator()
         toolsmenu.add_command(label="Standard ASCII Chart", command=lambda i=1: self.asciichartWindow(i))
         toolsmenu.add_command(label="Extended ASCII Chart", command=lambda i=2: self.asciichartWindow(i))
         menubar.add_cascade(label="Tools", menu=toolsmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
         helpmenu.add_command(label="About PEA", command=self.hello)
+        helpmenu.add_separator()
+        helpmenu.add_command(label="Donations", command=self.hello)
         menubar.add_cascade(label="Help", menu=helpmenu)
 
         root.config(menu=menubar)  
