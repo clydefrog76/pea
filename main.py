@@ -776,14 +776,14 @@ class Window(Frame):
 
         if index == 1:
             asciichartWindow.wm_title("Standard ASCII Chart")
-            image = PhotoImage(file='assets/Standard-ASCII-Table1.gif')
+            asciiimage = PhotoImage(file='assets/Standard-ASCII-Table1.gif')
         else:
             asciichartWindow.wm_title("Extended ASCII Chart")
-            image = PhotoImage(file='assets/Extended-ASCII-Table2.gif')
+            asciiimage = PhotoImage(file='assets/Extended-ASCII-Table2.gif')
 
-        bg_label = ttk.Label(asciichartWindow, image = image)
-        bg_label.place(x=0, y=0, relwidth=1, relheight=1)
-        bg_label.image = image            
+        asciilabel = ttk.Label(asciichartWindow, image = asciiimage)
+        asciilabel.place(x=0, y=0, relwidth=1, relheight=1)
+        asciilabel.image = asciiimage            
 
 def on_closing():
     """ closes the main window and kills the proces / task """
@@ -792,7 +792,6 @@ def on_closing():
         root.destroy()
         num = os.getpid()
         os.system("taskkill /f /pid {}".format(num))
-
 
 root = Tk()
 root.geometry("930x720")
