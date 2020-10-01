@@ -724,9 +724,10 @@ class Window(Frame):
             hexoutput.insert(0, hexvar)   
 
         def hexasciiFunction():
-            asciivar = binascii.unhexlify(hexentry.get())
-            asciioutput.delete(0, END)
-            asciioutput.insert(0, asciivar)                   
+            if len(hexentry.get()) in range(2,200,2):
+                asciivar = binascii.unhexlify(hexentry.get())
+                asciioutput.delete(0, END)
+                asciioutput.insert(0, asciivar)                   
 
         asciihexWindow = Toplevel()
         asciihexWindow.wm_title("ASCII - HEX Conversion")
