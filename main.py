@@ -107,9 +107,9 @@ class Window(Frame):
         sendlabel = ttk.Label(sendframe, text="String")
         sendlabel.pack(padx=5, pady=5, side=LEFT)
         self.sendentry = ttk.Entry(sendframe, width=50)
-        self.sendentry.insert(0, "Enter ASCII strings or HEX bytes with prefix \\x")
-        self.sendentry.bind("<Button-1>", self.on_click)
-        self.sendentry.bind("<FocusIn>", self.on_click)
+        self.sendentry.insert(0, "Replace this with ASCII or HEX bytes with prefix \\x")
+        self.sendentry.bind("<Button-1>", self.sendentry_click)
+        self.sendentry.bind("<FocusIn>", self.sendentry_click)
         self.sendentry.pack(padx=5, pady=5, side=LEFT)        
         self.sendbutton = ttk.Button(sendframe,
             text="Send", width=13,
@@ -286,25 +286,23 @@ class Window(Frame):
             self.conn.close()
             self.conn = None
 
-    def on_click(self, event):
-        self.sendentry.config(foreground='black')
-        if self.sendentry.get() == "Enter ASCII strings or HEX bytes with prefix \\x":
+    def sendentry_click(self, event):
+        if self.sendentry.get() == "Replace this with ASCII or HEX bytes with prefix \\x":
             event.widget.delete(0, END)
-        else:
-            self.sendentry.config(foreground='black')
 
     def sendFunction(self):
         """ sends a custom string defined in the code entry field """
 
-        sendbyte = ast.literal_eval(f'b"{self.sendentry.get()}"')
+        if self.sendentry.get() != "Replace this with ASCII or HEX bytes with prefix \\x":
+            sendbyte = ast.literal_eval(f'b"{self.sendentry.get()}"')
 
-        if self.conn:
-            port = self.port["connected"]
-            self.terminalFunction("OU", port, sendbyte)
-            self.conn.send(sendbyte)
-        else:
-            msg = "No TCP connection detected"
-            self.terminalFunction("--", None, msg)            
+            if self.conn:
+                port = self.port["connected"]
+                self.terminalFunction("OU", port, sendbyte)
+                self.conn.send(sendbyte)
+            else:
+                msg = "No TCP connection detected"
+                self.terminalFunction("--", None, msg)            
 
     def callCustomFunc(self, func):
         """ sends a custom data function """
@@ -346,7 +344,7 @@ class Window(Frame):
 
             if direction == "--":  # info lines
                 color = 0
-                msg = "{} | {} | {} | {}\n".format(msgdir, msgport, msgnow, msgdata)
+                msg = "{} | {} | {}\n".format(msgdir, msgnow, msgdata)
                 self.terminalbox.tag_config(
                     str(self.colorList[color]), foreground=self.colorList[color]
                 )
@@ -358,7 +356,7 @@ class Window(Frame):
                         color = 3                    
                     else:
                         color = 4
-                    msg = "{} | {} | {} | {}\n".format(msgdir, msgport, msgnow, msgdata)
+                    msg = "{} | {} | {}\n".format(msgdir, msgnow, msgdata)
                     self.terminalbox.tag_config(str(self.colorList[color]), foreground=self.colorList[color])
                     self.terminalbox.insert(END, msg, str(self.colorList[color]))
                     self.terminalbox.see(END)
