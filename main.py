@@ -547,7 +547,6 @@ class Window(Frame):
                 self.socket = mySocket
 
                 Thread(target=self.client_thread).start()
-
             else:
                 msg = "Port not openend, please load a file first!"
                 self.terminalFunction("--", None, msg)
@@ -576,43 +575,37 @@ class Window(Frame):
             if self.conn == None:  # no connection, open a new one
 
                 try:
-                    try:
-                        self.conn, addr = self.socket.accept()
-                        listen = self.socket.getsockname()[1]
-                    except:
-                        raise
-
-                    if listen == self.port["listen"]:
-                        self.port["connected"] = addr[1]
-
-                    self.buffer = b""
-                    self.disconnectbutton.config(state="active")
-                    
-                    if self.devscript:
-                        pass
-
-                    msg = "Client {} connected".format(addr[0])
-                    self.colorlabel.config(background=self.colorList[1])
-                    self.terminalFunction("--", addr[1], msg)
-
-                    if self.commandsList:
-                        if "ON_CONNECT" in self.commandsList[7][0]["Query"]:
-                            byteresponse = "{}".format(
-                                self.commandsList[7][0]["Response"]
-                            )
-                            time.sleep(0.25)
-                            byteresponsesend = (
-                                byteresponse.encode("latin-1")
-                                .decode("unicode_escape")
-                                .encode("latin-1")
-                            )
-                            self.terminalFunction("OU", addr[1], byteresponsesend)
-                            try:
-                                self.conn.send(byteresponsesend)
-                            except:
-                                print('Error sending bytes')
+                    self.conn, addr = self.socket.accept()
+                    listen = self.socket.getsockname()[1]
                 except:
                     raise
+
+                if listen == self.port["listen"]:
+                    self.port["connected"] = addr[1]
+
+                self.buffer = b""
+                self.disconnectbutton.config(state="active")
+
+                msg = "Client {} connected".format(addr[0])
+                self.colorlabel.config(background=self.colorList[1])
+                self.terminalFunction("--", addr[1], msg)
+
+                if self.commandsList:
+                    if "ON_CONNECT" in self.commandsList[7][0]["Query"]:
+                        byteresponse = "{}".format(
+                            self.commandsList[7][0]["Response"]
+                        )
+                        time.sleep(0.25)
+                        byteresponsesend = (
+                            byteresponse.encode("latin-1")
+                            .decode("unicode_escape")
+                            .encode("latin-1")
+                        )
+                        self.terminalFunction("OU", addr[1], byteresponsesend)
+                        try:
+                            self.conn.send(byteresponsesend)
+                        except:
+                            print('Error sending bytes')
 
             else:  # a connection exists
                 try:
