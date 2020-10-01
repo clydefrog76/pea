@@ -52,7 +52,9 @@ class Window(Frame):
         menubar.add_cascade(label="Edit", menu=editmenu)        
 
         toolsmenu = Menu(menubar, tearoff=0)
-        toolsmenu.add_command(label="ASCII - HEX Conversion", command=lambda: self.asciihexWindow())
+        toolsmenu.add_command(label="ASCII - HEX Converter", command=lambda: self.asciihexWindow())
+        toolsmenu.add_command(label="Standard ASCII Chart", command=lambda i=1: self.asciichartWindow(i))
+        toolsmenu.add_command(label="Extended ASCII Chart", command=lambda i=2: self.asciichartWindow(i))
         menubar.add_cascade(label="Tools", menu=toolsmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
@@ -730,7 +732,7 @@ class Window(Frame):
                 asciioutput.insert(0, asciivar)                   
 
         asciihexWindow = Toplevel()
-        asciihexWindow.wm_title("ASCII - HEX Conversion")
+        asciihexWindow.wm_title("ASCII - HEX Converter")
         asciihexWindow.pack_propagate(True)
         asciihexWindow.protocol("WM_DELETE_WINDOW", on_asciihexclosing)
 
@@ -756,7 +758,32 @@ class Window(Frame):
             text="Convert", width=13,
             command=lambda: hexasciiFunction(),
         )
-        convbutton2.pack(padx=5, pady=5, side=LEFT)                   
+        convbutton2.pack(padx=5, pady=5, side=LEFT)           
+
+    def asciichartWindow(self, index):
+        """ opens a new ASCII Chart window """
+         
+        def on_asciichartclosing():
+            """ kills the ASCII Chart window """
+
+            asciichartWindow.destroy()
+
+        asciichartWindow = Toplevel()
+        asciichartWindow.geometry("505x429")
+        asciichartWindow.resizable(width=False, height=False)
+        asciichartWindow.pack_propagate(True)
+        asciichartWindow.protocol("WM_DELETE_WINDOW", on_asciichartclosing)  
+
+        if index == 1:
+            asciichartWindow.wm_title("Standard ASCII Chart")
+            image = PhotoImage(file='assets/Standard-ASCII-Table1.gif')
+        else:
+            asciichartWindow.wm_title("Extended ASCII Chart")
+            image = PhotoImage(file='assets/Extended-ASCII-Table2.gif')
+
+        bg_label = ttk.Label(asciichartWindow, image = image)
+        bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+        bg_label.image = image            
 
 def on_closing():
     """ closes the main window and kills the proces / task """
@@ -770,7 +797,7 @@ def on_closing():
 root = Tk()
 root.geometry("930x720")
 root.resizable(width=False, height=False)
-root.call("wm", "iconphoto", root._w, PhotoImage(file="icon.png"))
+root.call("wm", "iconphoto", root._w, PhotoImage(file="assets/icon.png"))
 app = Window(root)
 
 mystyle = ttk.Style()
