@@ -31,9 +31,10 @@ class Window(Frame):
 
         self.master.title("PEA - Python Emulator for Audiovisual devices")
         self.pack(fill=BOTH, expand=1)
-        self.colorList = ["#FF0000", "#00FF00", "#DDEEFF", "#000000"]  
+        self.colorList = ["#FF0000", "#00FF00", "#DDEEFF", "#009900", "#000099"]
         self.terminalrunning = True
         self.commandsList = None
+        self.devscript = None
 
         # menu bar section ----------------------------------------------------
         menubar = Menu(root)
@@ -107,13 +108,14 @@ class Window(Frame):
         sendlabel.pack(padx=5, pady=5, side=LEFT)
         self.sendentry = ttk.Entry(sendframe, width=50)
         self.sendentry.insert(0, "Enter ASCII strings or HEX bytes with prefix \\x")
+        self.sendentry.bind("<Button-1>", self.on_click)
+        self.sendentry.bind("<FocusIn>", self.on_click)
         self.sendentry.pack(padx=5, pady=5, side=LEFT)        
         self.sendbutton = ttk.Button(sendframe,
             text="Send", width=13,
             command=lambda: self.sendFunction(),
         )
         self.sendbutton.pack(padx=5, pady=5, side=LEFT)
-        self.sendbutton.config(state="disabled")
 
         scriptframe = ttk.LabelFrame(mainframe2, text="Script Function Buttons",)
         scriptframe.grid(row=0, column=1, padx=8, pady=8, sticky='nsew')
@@ -122,35 +124,26 @@ class Window(Frame):
             command=lambda i=1: self.callCustomFunc(i),
         )
         self.scriptbutton1.pack(padx=5, pady=5, side=LEFT)
-        self.scriptbutton1.config(state="disabled")     
-
         self.scriptbutton2 = ttk.Button(scriptframe,
             text="Func 2", width=11,
             command=lambda i=2: self.callCustomFunc(i),
         )
         self.scriptbutton2.pack(padx=5, pady=5, side=LEFT)
-        self.scriptbutton2.config(state="disabled")
-
         self.scriptbutton3 = ttk.Button(scriptframe,
             text="Func 3", width=11,
             command=lambda i=3: self.callCustomFunc(i),
         )
         self.scriptbutton3.pack(padx=5, pady=5, side=LEFT)
-        self.scriptbutton3.config(state="disabled") 
-
         self.scriptbutton4 = ttk.Button(scriptframe,
             text="Func4", width=11,
             command=lambda i=4: self.callCustomFunc(i),
         )
         self.scriptbutton4.pack(padx=5, pady=5, side=LEFT)
-        self.scriptbutton4.config(state="disabled") 
-
         self.scriptbutton5 = ttk.Button(scriptframe,
             text="Func 5", width=11,
             command=lambda i=5: self.callCustomFunc(i),
         )
-        self.scriptbutton5.pack(padx=5, pady=5, side=LEFT)
-        self.scriptbutton5.config(state="disabled")                                  
+        self.scriptbutton5.pack(padx=5, pady=5, side=LEFT)                              
 
         # terminal commands grid section --------------------------------------
 
@@ -293,6 +286,13 @@ class Window(Frame):
             self.conn.close()
             self.conn = None
 
+    def on_click(self, event):
+        self.sendentry.config(foreground='black')
+        if self.sendentry.get() == "Enter ASCII strings or HEX bytes with prefix \\x":
+            event.widget.delete(0, END)
+        else:
+            self.sendentry.config(foreground='black')
+
     def sendFunction(self):
         """ sends a custom string defined in the code entry field """
 
@@ -302,6 +302,9 @@ class Window(Frame):
             port = self.port["connected"]
             self.terminalFunction("OU", port, sendbyte)
             self.conn.send(sendbyte)
+        else:
+            msg = "No TCP connection detected"
+            self.terminalFunction("--", None, msg)            
 
     def callCustomFunc(self, func):
         """ sends a custom data function """
@@ -323,7 +326,13 @@ class Window(Frame):
 
                 port = self.port["connected"]
                 self.terminalFunction("OU", port, byteresponsesend)
-                self.conn.send(byteresponsesend)            
+                self.conn.send(byteresponsesend)
+            else:
+                msg = "No TCP connection detected"
+                self.terminalFunction("--", None, msg)                           
+        else:
+            msg = "No script functions are loaded"
+            self.terminalFunction("--", None, msg)                      
 
     def terminalFunction(self, direction, port, data):
         """ function for printing to the terminal window """
@@ -336,25 +345,22 @@ class Window(Frame):
             msgdata = str(data)
 
             if direction == "--":  # info lines
-                index = 0  # always show in black
+                color = 0
                 msg = "{} | {} | {} | {}\n".format(msgdir, msgport, msgnow, msgdata)
                 self.terminalbox.tag_config(
-                    str(self.colorList[index]), foreground=self.colorList[index]
+                    str(self.colorList[color]), foreground=self.colorList[color]
                 )
-                self.terminalbox.insert(END, msg, str(self.colorList[index]))
+                self.terminalbox.insert(END, msg, str(self.colorList[color]))
                 self.terminalbox.see(END)
             else:  # lines for incoming or outgoing data
                 if port == self.port["connected"]:
-                    msg = "{} | {} | {} | {}\n".format(
-                        msgdir, msgport, msgnow, msgdata
-                    )
-                    self.terminalbox.tag_config(
-                        str(self.colorList[3]),
-                        foreground=self.colorList[3],
-                    )
-                    self.terminalbox.insert(
-                        END, msg, str(self.colorList[3])
-                    )
+                    if direction == "IN":
+                        color = 3                    
+                    else:
+                        color = 4
+                    msg = "{} | {} | {} | {}\n".format(msgdir, msgport, msgnow, msgdata)
+                    self.terminalbox.tag_config(str(self.colorList[color]), foreground=self.colorList[color])
+                    self.terminalbox.insert(END, msg, str(self.colorList[color]))
                     self.terminalbox.see(END)
 
         self.terminallengthFunction()
@@ -587,7 +593,6 @@ class Window(Frame):
                         pass
 
                     msg = "Client {} connected".format(addr[0])
-                    self.sendbutton.config(state="enabled")
                     self.colorlabel.config(background=self.colorList[1])
                     self.terminalFunction("--", addr[1], msg)
 
@@ -622,7 +627,6 @@ class Window(Frame):
                         self.disconnectbutton.config(state="disabled")
                         if addr:
                             msg = "Client {} disconnected".format(addr[0])
-                            self.sendbutton.config(state="disabled")
                             self.colorlabel.config(background=self.colorList[0])
                             self.terminalFunction("--", addr[1], msg)
 
