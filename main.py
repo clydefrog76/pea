@@ -708,11 +708,9 @@ class Window(Frame):
 
         self.host = ""
         self.port = {"listen": 0, "connected": 0}
-
         self.conn = None
         self.buffer = None
         self.socket = None
-
         self.running = True
 
     def asciihexWindow(self):
