@@ -729,10 +729,21 @@ class Window(Frame):
             hexoutput.insert(0, hexvar)   
 
         def hexasciiFunction():
-            if len(hexentry.get()) in range(2,200,2):
-                asciivar = binascii.unhexlify(hexentry.get())
-                asciioutput.delete(0, END)
-                asciioutput.insert(0, asciivar)                   
+            for char in hexentry.get():
+                if char in ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','a','b','c','d','e','f']:
+                    if len(hexentry.get()) in range(2,200,2):
+                        try:
+                            asciivar = binascii.unhexlify(hexentry.get())
+                            asciioutput.delete(0, END)
+                            asciioutput.insert(0, asciivar)
+                        except:
+                            pass
+                    else:
+                        asciioutput.delete(0, END)
+                        asciioutput.insert(0, 'Length Error')                        
+                else:
+                    asciioutput.delete(0, END)
+                    asciioutput.insert(0, 'Character Error')
 
         asciihexWindow = Toplevel()
         asciihexWindow.wm_title("ASCII - HEX Converter")
