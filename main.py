@@ -40,9 +40,9 @@ class Window(Frame):
 
         menubar = Menu(root)
         filemenu = Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Browse for Emulator JSON File", command=lambda: self.browseFunction())
+        filemenu.add_command(label="Browse for Emulator JSON File", command=self.browseFunction)
         filemenu.add_separator()
-        filemenu.add_command(label="Exit PEA", command=lambda: on_closing())
+        filemenu.add_command(label="Exit PEA", command=on_closing)
         menubar.add_cascade(label="File", menu=filemenu)
 
         editmenu = Menu(menubar, tearoff=0)
@@ -52,7 +52,7 @@ class Window(Frame):
         menubar.add_cascade(label="Edit", menu=editmenu)        
 
         toolsmenu = Menu(menubar, tearoff=0)
-        toolsmenu.add_command(label="ASCII - HEX Converter", command=lambda: self.asciihexWindow())
+        toolsmenu.add_command(label="ASCII - HEX Converter", command=self.asciihexWindow)
         toolsmenu.add_separator()
         toolsmenu.add_command(label="Standard ASCII Chart", command=lambda i=1: self.asciichartWindow(i))
         toolsmenu.add_command(label="Extended ASCII Chart", command=lambda i=2: self.asciichartWindow(i))
