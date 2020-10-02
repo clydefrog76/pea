@@ -746,6 +746,7 @@ class Window(Frame):
         asciihexWindow = Toplevel()
         asciihexWindow.geometry("390x138+{}+{}".format(root.winfo_rootx()+260, root.winfo_rooty()+240))
         asciihexWindow.wm_title("ASCII - HEX Converter")
+        asciihexWindow.resizable(width=False, height=False)
         asciihexWindow.pack_propagate(True)
         asciihexWindow.protocol("WM_DELETE_WINDOW", on_asciihexclosing)
 
