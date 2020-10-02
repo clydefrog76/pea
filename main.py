@@ -746,6 +746,7 @@ class Window(Frame):
                     asciioutput.insert(0, 'Character Error')
 
         asciihexWindow = Toplevel()
+        asciihexWindow.geometry("390x138+{}+{}".format(root.winfo_rootx()+260, root.winfo_rooty()+240))
         asciihexWindow.wm_title("ASCII - HEX Converter")
         asciihexWindow.pack_propagate(True)
         asciihexWindow.protocol("WM_DELETE_WINDOW", on_asciihexclosing)
@@ -783,7 +784,7 @@ class Window(Frame):
             asciichartWindow.destroy()
 
         asciichartWindow = Toplevel()
-        asciichartWindow.geometry("505x429")
+        asciichartWindow.geometry("505x429+{}+{}".format(root.winfo_rootx()+203, root.winfo_rooty()+100))
         asciichartWindow.resizable(width=False, height=False)
         asciichartWindow.pack_propagate(True)
         asciichartWindow.protocol("WM_DELETE_WINDOW", on_asciichartclosing)  
