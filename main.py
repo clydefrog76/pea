@@ -825,11 +825,24 @@ class Window(Frame):
             aboutWindow.destroy()
 
         aboutWindow = Toplevel()
-        aboutWindow.geometry("505x429+{}+{}".format(root.winfo_rootx()+205, root.winfo_rooty()+95))
+        aboutWindow.geometry("402x305+{}+{}".format(root.winfo_rootx()+255, root.winfo_rooty()+155))
         aboutWindow.wm_title("About PEA")
         aboutWindow.resizable(width=False, height=False)
         aboutWindow.pack_propagate(True)
         aboutWindow.protocol("WM_DELETE_WINDOW", on_aboutclosing) 
+
+        aboutCanvas = Canvas(aboutWindow, width=0, height=0)
+        aboutCanvas.pack(expand=YES, fill=BOTH)
+        pealogo = PhotoImage(file='assets/logo.gif')
+        aboutCanvas.pealogo = pealogo
+        aboutCanvas.create_image((10, 10), anchor='nw', image=pealogo)
+        aboutmsg = '''PEA: a python written tcp device emulator\n
+Version: 1.0.0
+Python Version: 3.8.5\n
+Github Repo: https://github.com/clydefrog76/pea\n
+Programmers: Alexander Teusch
+             Rupert Powell'''
+        aboutCanvas.create_text(10, 150, anchor='nw', font=("Consolas", 10), text=aboutmsg)  
 
     def donationsWindow(self):
         """ opens a new Donations window """
@@ -846,8 +859,8 @@ class Window(Frame):
         donationsWindow.pack_propagate(True)
         donationsWindow.protocol("WM_DELETE_WINDOW", on_donationsclosing)  
 
-        donationsCanvas = Canvas(donationsWindow, width=0, height=0)   # 0,0 is top left corner
-        donationsCanvas.pack(expand=YES, fill=BOTH)                   # increases down, right
+        donationsCanvas = Canvas(donationsWindow, width=0, height=0)
+        donationsCanvas.pack(expand=YES, fill=BOTH)
         donationsmsg = '''Although PEA is free, fully open-source and build with the community
 in mind, we the developers still have spend dozends of hours in\ncreating and testing this tool.\n
 If you like this great tool and you wish to support us and contribute
