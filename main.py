@@ -746,7 +746,7 @@ class Window(Frame):
                     asciioutput.insert(0, 'Character Error')
 
         asciihexWindow = Toplevel()
-        asciihexWindow.geometry("390x138+{}+{}".format(root.winfo_rootx()+260, root.winfo_rooty()+240))
+        asciihexWindow.geometry("390x138+{}+{}".format(root.winfo_rootx()+262, root.winfo_rooty()+245))
         asciihexWindow.wm_title("ASCII - HEX Converter")
         asciihexWindow.resizable(width=False, height=False)
         asciihexWindow.pack_propagate(True)
@@ -810,7 +810,7 @@ class Window(Frame):
             howtoWindow.destroy()
 
         howtoWindow = Toplevel()
-        howtoWindow.geometry("505x429+{}+{}".format(root.winfo_rootx()+203, root.winfo_rooty()+100))
+        howtoWindow.geometry("505x429+{}+{}".format(root.winfo_rootx()+205, root.winfo_rooty()+95))
         howtoWindow.wm_title("How to use PEA")
         howtoWindow.resizable(width=False, height=False)
         howtoWindow.pack_propagate(True)
@@ -825,7 +825,7 @@ class Window(Frame):
             aboutWindow.destroy()
 
         aboutWindow = Toplevel()
-        aboutWindow.geometry("505x429+{}+{}".format(root.winfo_rootx()+203, root.winfo_rooty()+100))
+        aboutWindow.geometry("505x429+{}+{}".format(root.winfo_rootx()+205, root.winfo_rooty()+95))
         aboutWindow.wm_title("About PEA")
         aboutWindow.resizable(width=False, height=False)
         aboutWindow.pack_propagate(True)
@@ -840,7 +840,7 @@ class Window(Frame):
             donationsWindow.destroy()
 
         donationsWindow = Toplevel()
-        donationsWindow.geometry("510x580+{}+{}".format(root.winfo_rootx()+205, root.winfo_rooty()+10))
+        donationsWindow.geometry("510x580+{}+{}".format(root.winfo_rootx()+202, root.winfo_rooty()+19))
         donationsWindow.wm_title("Donations")
         donationsWindow.resizable(width=False, height=False)
         donationsWindow.pack_propagate(True)
