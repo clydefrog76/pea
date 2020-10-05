@@ -14,7 +14,7 @@
 
 from threading import Thread
 import tkinter.ttk as ttk
-from tkinter import Tk, messagebox, Text, Frame, Menu, PhotoImage, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Toplevel, StringVar, TclError
+from tkinter import Tk, messagebox, Text, Canvas, Frame, Menu, PhotoImage, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Toplevel, StringVar, TclError
 from tkinter.filedialog import askopenfilename
 import os, socket, sys, json, time, ast, datetime, binascii
 
@@ -59,9 +59,9 @@ class Window(Frame):
         menubar.add_cascade(label="Tools", menu=toolsmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
-        helpmenu.add_command(label="About PEA", command=self.hello)
+        helpmenu.add_command(label="About PEA", command=self.aboutWindow)
         helpmenu.add_separator()
-        helpmenu.add_command(label="Donations", command=self.hello)
+        helpmenu.add_command(label="Donations", command=self.donationsWindow)
         menubar.add_cascade(label="Help", menu=helpmenu)
 
         root.config(menu=menubar)  
@@ -797,7 +797,48 @@ class Window(Frame):
 
         asciilabel = ttk.Label(asciichartWindow, image = asciiimage)
         asciilabel.place(x=0, y=0, relwidth=1, relheight=1)
-        asciilabel.image = asciiimage            
+        asciilabel.image = asciiimage   
+
+    def aboutWindow(self):
+        """ opens a new About window """
+         
+        def on_aboutclosing():
+            """ kills the About window """
+
+            aboutWindow.destroy()
+
+        aboutWindow = Toplevel()
+        aboutWindow.geometry("505x429+{}+{}".format(root.winfo_rootx()+203, root.winfo_rooty()+100))
+        aboutWindow.wm_title("About PEA")
+        aboutWindow.resizable(width=False, height=False)
+        aboutWindow.pack_propagate(True)
+        aboutWindow.protocol("WM_DELETE_WINDOW", on_aboutclosing) 
+
+    def donationsWindow(self):
+        """ opens a new Donations window """
+         
+        def on_donationsclosing():
+            """ kills the Donations window """
+
+            donationsWindow.destroy()
+
+        donationsWindow = Toplevel()
+        donationsWindow.geometry("505x429+{}+{}".format(root.winfo_rootx()+203, root.winfo_rooty()+100))
+        donationsWindow.wm_title("Donations")
+        donationsWindow.resizable(width=False, height=False)
+        donationsWindow.pack_propagate(True)
+        donationsWindow.protocol("WM_DELETE_WINDOW", on_donationsclosing)  
+
+        donationsCanvas = Canvas(donationsWindow, width=0, height=0)   # 0,0 is top left corner
+        donationsCanvas.pack(expand=YES, fill=BOTH)                   # increases down, right
+        donationsmsg = 'Although PEA is free, fully open-source and build with the community\nin mind, we the developers still have spend hundreds of hours in\ncreating and testing this tool.\n\n\
+If you like this great tool and you wish to support us and contribute\nto future improvents, updates or even just some beer money, please\nfeel free to donate ANY amount you like, big or small to:'
+        donationsCanvas.create_text(15, 15, anchor='nw', font=("Consolas", 10), text=donationsmsg)     
+        donationsCanvas.create_text(15, 150, anchor='nw', font=("Consolas", 10), text='PayPal:')
+        donationsCanvas.create_text(85, 150, anchor='nw', font=("Consolas", 10), text='alexander.teusch@runbox.com')
+        donationsCanvas.create_text(15, 175, anchor='nw', font=("Consolas", 10), text='Bitcoin:')
+        bitcoin = PhotoImage(file='assets/bitcoin.gif')
+        donationsCanvas.create_image(85, 175, anchor='nw', image=bitcoin)
 
 def on_closing():
     """ closes the main window and kills the proces / task """
