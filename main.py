@@ -848,8 +848,11 @@ class Window(Frame):
 
         donationsCanvas = Canvas(donationsWindow, width=0, height=0)   # 0,0 is top left corner
         donationsCanvas.pack(expand=YES, fill=BOTH)                   # increases down, right
-        donationsmsg = 'Although PEA is free, fully open-source and build with the community\nin mind, we the developers still have spend dozends of hours in\ncreating and testing this tool.\n\n\
-If you like this great tool and you wish to support us and contribute\nto future improvents, updates or even just some beer money, please\nfeel free to donate ANY amount you like, big or small to:'
+        donationsmsg = '''Although PEA is free, fully open-source and build with the community
+in mind, we the developers still have spend dozends of hours in\ncreating and testing this tool.\n
+If you like this great tool and you wish to support us and contribute
+to future improvents, updates or even just some beer money, please
+feel free to donate ANY amount you like, big or small to:'''
         donationsCanvas.create_text(15, 15, anchor='nw', font=("Consolas", 10), text=donationsmsg)     
         donationsCanvas.create_text(15, 150, anchor='nw', font=("Consolas", 10), text='PayPal:', fill='blue')
         donationsCanvas.create_text(85, 150, anchor='nw', font=("Consolas", 10), text='alexander.teusch@runbox.com')
