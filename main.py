@@ -836,7 +836,7 @@ class Window(Frame):
         pealogo = PhotoImage(file='assets/logo.gif')
         aboutCanvas.pealogo = pealogo
         aboutCanvas.create_image((10, 10), anchor='nw', image=pealogo)
-        aboutmsg = '''PEA: a python written tcp device emulator\n
+        aboutmsg = '''PEA: a python written tcp ethernet device emulator\n
 Version: 1.0.0
 Python Version: 3.8.5\n
 Github Repo: https://github.com/clydefrog76/pea\n
