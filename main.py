@@ -823,7 +823,7 @@ class Window(Frame):
             donationsWindow.destroy()
 
         donationsWindow = Toplevel()
-        donationsWindow.geometry("505x429+{}+{}".format(root.winfo_rootx()+203, root.winfo_rooty()+100))
+        donationsWindow.geometry("510x580+{}+{}".format(root.winfo_rootx()+205, root.winfo_rooty()+10))
         donationsWindow.wm_title("Donations")
         donationsWindow.resizable(width=False, height=False)
         donationsWindow.pack_propagate(True)
@@ -838,7 +838,8 @@ If you like this great tool and you wish to support us and contribute\nto future
         donationsCanvas.create_text(85, 150, anchor='nw', font=("Consolas", 10), text='alexander.teusch@runbox.com')
         donationsCanvas.create_text(15, 175, anchor='nw', font=("Consolas", 10), text='Bitcoin:')
         bitcoin = PhotoImage(file='assets/bitcoin.gif')
-        donationsCanvas.create_image(85, 175, anchor='nw', image=bitcoin)
+        donationsCanvas.bitcoin = bitcoin
+        donationsCanvas.create_image((85, 175), anchor='nw', image=bitcoin)
 
 def on_closing():
     """ closes the main window and kills the proces / task """
