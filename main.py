@@ -59,10 +59,12 @@ class Window(Frame):
         menubar.add_cascade(label="Tools", menu=toolsmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
-        helpmenu.add_command(label="About PEA", command=self.aboutWindow)
+        helpmenu.add_command(label="How to use PEA", command=self.howtoWindow)
         helpmenu.add_separator()
-        helpmenu.add_command(label="Donations", command=self.donationsWindow)
+        helpmenu.add_command(label="About PEA", command=self.aboutWindow)
         menubar.add_cascade(label="Help", menu=helpmenu)
+
+        menubar.add_command(label="Donate", command=self.donationsWindow)        
 
         root.config(menu=menubar)  
 
@@ -798,6 +800,21 @@ class Window(Frame):
         asciilabel = ttk.Label(asciichartWindow, image = asciiimage)
         asciilabel.place(x=0, y=0, relwidth=1, relheight=1)
         asciilabel.image = asciiimage   
+
+    def howtoWindow(self):
+        """ opens a new About window """
+         
+        def on_howtoclosing():
+            """ kills the About window """
+
+            howtoWindow.destroy()
+
+        howtoWindow = Toplevel()
+        howtoWindow.geometry("505x429+{}+{}".format(root.winfo_rootx()+203, root.winfo_rooty()+100))
+        howtoWindow.wm_title("How to use PEA")
+        howtoWindow.resizable(width=False, height=False)
+        howtoWindow.pack_propagate(True)
+        howtoWindow.protocol("WM_DELETE_WINDOW", on_howtoclosing) 
 
     def aboutWindow(self):
         """ opens a new About window """
