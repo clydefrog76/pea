@@ -834,9 +834,9 @@ class Window(Frame):
         donationsmsg = 'Although PEA is free, fully open-source and build with the community\nin mind, we the developers still have spend hundreds of hours in\ncreating and testing this tool.\n\n\
 If you like this great tool and you wish to support us and contribute\nto future improvents, updates or even just some beer money, please\nfeel free to donate ANY amount you like, big or small to:'
         donationsCanvas.create_text(15, 15, anchor='nw', font=("Consolas", 10), text=donationsmsg)     
-        donationsCanvas.create_text(15, 150, anchor='nw', font=("Consolas", 10), text='PayPal:')
+        donationsCanvas.create_text(15, 150, anchor='nw', font=("Consolas", 10), text='PayPal:', fill='blue')
         donationsCanvas.create_text(85, 150, anchor='nw', font=("Consolas", 10), text='alexander.teusch@runbox.com')
-        donationsCanvas.create_text(15, 175, anchor='nw', font=("Consolas", 10), text='Bitcoin:')
+        donationsCanvas.create_text(15, 175, anchor='nw', font=("Consolas", 10), text='Bitcoin:', fill='blue')
         bitcoin = PhotoImage(file='assets/bitcoin.gif')
         donationsCanvas.bitcoin = bitcoin
         donationsCanvas.create_image((85, 175), anchor='nw', image=bitcoin)
