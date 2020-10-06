@@ -549,11 +549,11 @@ class Window(Frame):
 
                 self.mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.mySocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                self.mySocket.bind((self.host, self.port["listen"]))
+                self.mySocket.bind(('127.0.0.1', self.port["listen"]))
                 self.mySocket.listen()
 
                 SocketThread = Thread(target=self.client_thread)
-                SocketThread.start()
+                SocketThread.start()           
 
             else:
                 msg = "Port not openend, please load a file first!"
@@ -708,7 +708,6 @@ class Window(Frame):
     def initialize(self):
         """ initialization of main objects """
 
-        self.host = ""
         self.port = {"listen": 0, "connected": 0}
         self.conn = None
         self.buffer = None
