@@ -553,7 +553,9 @@ class Window(Frame):
                 mySocket.listen()
                 self.socket = mySocket
 
-                Thread(target=self.client_thread).start()
+                SocketThread = Thread(target=self.client_thread)
+                SocketThread.start()
+                
             else:
                 msg = "Port not openend, please load a file first!"
                 self.terminalFunction("--", None, msg)
@@ -571,7 +573,6 @@ class Window(Frame):
                 self.buffer = b""
                 self.conn.close()
                 self.conn = None
-                self.socket.close()
 
     def client_thread(self, action=None):
         """ a threaded function for individual sockets and their connections """
