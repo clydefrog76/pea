@@ -547,15 +547,14 @@ class Window(Frame):
                 self.portentry.insert(0, str(self.port["listen"]))
                 self.portentry.config(state="disabled")
 
-                mySocket = socket.socket()
-                mySocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                mySocket.bind((self.host, self.port["listen"]))
-                mySocket.listen()
-                self.socket = mySocket
+                self.mySocket = socket.socket()
+                self.mySocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                self.mySocket.bind((self.host, self.port["listen"]))
+                self.mySocket.listen()
 
                 SocketThread = Thread(target=self.client_thread)
                 SocketThread.start()
-                
+
             else:
                 msg = "Port not openend, please load a file first!"
                 self.terminalFunction("--", None, msg)
@@ -566,7 +565,7 @@ class Window(Frame):
 
             self.portentry.config(state="normal")
             self.portbutton.config(text="Open Port")
-            self.socket.close()
+            self.mySocket.close()
             self.port["listen"] = 0
 
             if self.conn:
@@ -583,8 +582,8 @@ class Window(Frame):
             if self.conn == None:  # no connection, open a new one
 
                 try:
-                    self.conn, addr = self.socket.accept()
-                    listen = self.socket.getsockname()[1]
+                    self.conn, addr = self.mySocket.accept()
+                    listen = self.mySocket.getsockname()[1]
                 except:
                     raise
 
@@ -713,7 +712,7 @@ class Window(Frame):
         self.port = {"listen": 0, "connected": 0}
         self.conn = None
         self.buffer = None
-        self.socket = None
+        self.mySocket = None
         self.running = True
 
     def asciihexWindow(self):
