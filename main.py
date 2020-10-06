@@ -547,7 +547,7 @@ class Window(Frame):
                 self.portentry.insert(0, str(self.port["listen"]))
                 self.portentry.config(state="disabled")
 
-                self.mySocket = socket.socket()
+                self.mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.mySocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 self.mySocket.bind((self.host, self.port["listen"]))
                 self.mySocket.listen()
