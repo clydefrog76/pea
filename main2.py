@@ -4,7 +4,7 @@ from tkinter.filedialog import askopenfilename
 import os, socket, sys, json, time, ast, datetime, binascii
 import asyncio
 
-async def run_tk(root, interval=0.05):
+async def run_tk(root, interval=0.01):
     '''
     Run a tkinter app in an asyncio event loop.
     '''
@@ -33,6 +33,12 @@ class Window(Frame):
         self.terminalrunning = True
         self.commandsList = None
         self.devscript = None
+        
+        self.port = {"listen": 0, "connected": 0}
+        self.mySocket = None
+        #self.buffer = None
+        #self.mySocket = None
+        #self.running = True        
 
 # menu bar section ----------------------------------------------------
 
@@ -236,7 +242,7 @@ class Window(Frame):
         if fname:
             try:
                 msg = "Loading {}".format(fname)
-                self.terminalFunction("--", None, msg)
+                self.terminalFunction("--", msg)
             except:
                 print("Failed to read file\n'%s'" % fname)
 
@@ -265,17 +271,17 @@ class Window(Frame):
                     msg = "{} - {} loaded with a Response Delay of {}s".format(
                         loadedManufacturer, loadedModel, loadedDelay
                     )
-                    self.terminalFunction("--", None, msg)
+                    self.terminalFunction("--", msg)
 
                     if data[6]["Script"]:  # If a script is specified then also open that
                         msg = "Importing Script file: {}.py".format(scriptName)
-                        self.terminalFunction("--", None, msg)
+                        self.terminalFunction("--", msg)
                         sys.path.append("{}".format(path))
                         try:
                             self.devscript = __import__(scriptName)
                         except Exception as e:
                             msg = "Script import failed: {}.py".format(e)
-                            self.terminalFunction("--", None, msg)
+                            self.terminalFunction("--", msg)
                     else:
                         self.devscript = None
         except Exception as e:
@@ -284,10 +290,7 @@ class Window(Frame):
     def disconnectFunction(self):
         """ declare the function when pressed on the disconnect button """
 
-        self.buffer = b""
-        if self.conn:
-            self.conn.close()
-            self.conn = None
+        app.mySocket.close()
 
     def sendentry_click(self, event):
         if self.sendentry.get() == "Replace this with ASCII or HEX bytes with prefix \\x":
@@ -299,13 +302,12 @@ class Window(Frame):
         if self.sendentry.get() != "Replace this with ASCII or HEX bytes with prefix \\x":
             sendbyte = ast.literal_eval(f'b"{self.sendentry.get()}"')
 
-            if self.conn:
-                port = self.port["connected"]
-                self.terminalFunction("OU", port, sendbyte)
-                self.conn.send(sendbyte)
+            if app.mySocket:
+                self.terminalFunction("OU", sendbyte)
+                app.mySocket.write(sendbyte)
             else:
                 msg = "No TCP connection detected"
-                self.terminalFunction("--", None, msg)            
+                self.terminalFunction("--", msg)            
 
     def callCustomFunc(self, func):
         """ sends a custom data function """
@@ -325,27 +327,25 @@ class Window(Frame):
                     .encode("latin-1")
                 )
 
-                port = self.port["connected"]
-                self.terminalFunction("OU", port, byteresponsesend)
+                self.terminalFunction("OU", byteresponsesend)
                 self.conn.send(byteresponsesend)
             else:
                 msg = "No TCP connection detected"
-                self.terminalFunction("--", None, msg)                           
+                self.terminalFunction("--", msg)                           
         else:
             msg = "No script functions are loaded"
-            self.terminalFunction("--", None, msg)                      
+            self.terminalFunction("--", msg)                      
 
-    def terminalFunction(self, direction, port, data):
+    def terminalFunction(self, direction, data):
         """ function for printing to the terminal window """
 
         if self.terminalrunning:
             msgdir = str(direction)
-            #msgport = str(port)
             now = datetime.datetime.now()
             msgnow = str(now.strftime("%H:%M:%S.%f")[:-3])
             msgdata = str(data)
 
-            if direction == "--":  # info lines
+            if direction == "--" or direction == 'ER':  # info or error lines
                 color = 0
                 msg = "{} | {} | {}\n".format(msgdir, msgnow, msgdata)
                 self.terminalbox.tag_config(
@@ -353,16 +353,16 @@ class Window(Frame):
                 )
                 self.terminalbox.insert(END, msg, str(self.colorList[color]))
                 self.terminalbox.see(END)
+
             else:  # lines for incoming or outgoing data
-                if port == self.port["connected"]:
-                    if direction == "IN":
-                        color = 3                    
-                    else:
-                        color = 4
-                    msg = "{} | {} | {}\n".format(msgdir, msgnow, msgdata)
-                    self.terminalbox.tag_config(str(self.colorList[color]), foreground=self.colorList[color])
-                    self.terminalbox.insert(END, msg, str(self.colorList[color]))
-                    self.terminalbox.see(END)
+                if direction == "IN":
+                    color = 3                    
+                else:
+                    color = 4
+                msg = "{} | {} | {}\n".format(msgdir, msgnow, msgdata)
+                self.terminalbox.tag_config(str(self.colorList[color]), foreground=self.colorList[color])
+                self.terminalbox.insert(END, msg, str(self.colorList[color]))
+                self.terminalbox.see(END)
 
         self.terminallengthFunction()
 
@@ -682,31 +682,150 @@ feel free to donate ANY amount you like, big or small to:'''
         donationsCanvas.create_text(15, 175, anchor='nw', font=("Consolas", 10), text='Bitcoin:', fill='blue')
         bitcoin = PhotoImage(file='assets/bitcoin.gif')
         donationsCanvas.bitcoin = bitcoin
-        donationsCanvas.create_image((85, 175), anchor='nw', image=bitcoin)                
+        donationsCanvas.create_image((85, 175), anchor='nw', image=bitcoin)
+
+    # start of socket functions -----------------------------------------------------------------------------------------------                
 
     async def listenFunction(self):
         """ gets trigger from Open Port button or the file loader """
-        try:
-            loop = asyncio.get_running_loop()
-            self.sock = await loop.create_server(lambda: EchoServerProtocol(),'127.0.0.1', 1024)
-        except Exception as e:
-            print(e)         
 
-class EchoServerProtocol(asyncio.Protocol):
+        if str(self.portbutton["text"]) == "Open Port":
+            if self.commandsList:
+                self.portbutton.config(text="Close Port")
+                
+                newport = int(self.portentry.get())
+                self.port["listen"] = newport
+
+                msg = "Port {} is open".format(newport)
+                self.terminalFunction("--", msg)
+
+                self.portentry.delete(0, END)
+                self.portentry.insert(0, str(self.port["listen"]))
+                self.portentry.config(state="disabled")   
+
+                try:
+                    loop = asyncio.get_running_loop()
+                    self.sock = await loop.create_server(lambda: SocketServer(),'127.0.0.1', int(self.portentry.get()))
+                except Exception as e:
+                    print(e)                        
+
+            else:
+                msg = "Port not openend, please load a file first!"
+                self.terminalFunction("--", msg)
+
+        elif str(self.portbutton["text"]) == "Close Port":
+            msg = "Port is closed"
+            self.terminalFunction("--", msg)            
+
+            self.portentry.config(state="normal")
+            self.portbutton.config(text="Open Port")
+            self.port["listen"] = 0      
+
+            SocketServer.connection_close()
+
+class SocketServer(asyncio.Protocol):
+    
     def connection_made(self, transport):
-        peername = transport.get_extra_info('peername')
-        print('Connection from {}'.format(peername))
-        self.transport = transport
+        self.socketdetails = transport.get_extra_info('sockname')
+        app.port["connected"] = self.socketdetails[1]
+        app.mySocket = transport 
+
+        msg = "Client {} connected".format(self.socketdetails[0])
+        app.colorlabel.config(background=app.colorList[1])
+        app.terminalFunction("--", msg)
+
+        if app.commandsList:
+            if "ON_CONNECT" in app.commandsList[7][0]["Query"]:
+                byteresponse = "{}".format(
+                    app.commandsList[7][0]["Response"]
+                )
+                byteresponsesend = (
+                    byteresponse.encode("latin-1")
+                    .decode("unicode_escape")
+                    .encode("latin-1")
+                )
+                app.terminalFunction("OU", byteresponsesend)
+                try:
+                    app.mySocket.write(byteresponsesend)
+                except:
+                    print('Error sending bytes')          
 
     def data_received(self, data):
-        message = data.decode()
-        print('Data received: {!r}'.format(message))
+        app.terminalFunction("IN", data) 
 
-        print('Send: {!r}'.format(message))
-        self.transport.write(data)
+        self.idx = 0
 
-        print('Close the client socket')
-        self.transport.close()
+        if app.commandsList:
+            result = any(
+                str(x["Query"])
+                .encode("latin-1")
+                .decode("unicode_escape")
+                .encode("latin-1")
+                == data
+                for self.idx, x in enumerate(app.commandsList[7])
+            )
+
+            if result:  # command found in query
+                delay = float(app.commandsList[5]["Delay"])
+                byteresponse = "{}".format(
+                    app.commandsList[7][self.idx]["Response"]
+                )
+                time.sleep(delay)
+                byteresponsesend = (
+                    byteresponse.encode("latin-1")
+                    .decode("unicode_escape")
+                    .encode("latin-1")
+                )
+                app.terminalFunction("OU", byteresponsesend)
+                try:
+                    app.mySocket.write(byteresponsesend)
+                except:
+                    pass
+            else:  # command not found in query, trying script
+
+                if app.devscript:  # invoke the script (if there is one)
+                    try:
+                        byteresponse = app.devscript.rxscript(
+                            self.conn, self.buffer
+                        )
+                    except Exception as e:
+                        print('Exception occured in devscript', e)
+
+                    if byteresponse:
+                        byteresponsesend = (
+                            byteresponse.encode("latin-1")
+                            .decode("unicode_escape")
+                            .encode("latin-1")
+                        )
+                        app.mySocket.write(byteresponsesend)
+                        app.terminalFunction("OU", byteresponsesend)
+                    else:  # Nothing found in query or script
+                        byteresponse = "Error - no match found in query or script"
+                        app.terminalFunction("ER", byteresponse)
+                        try:
+                            app.mySocket.write(bytes(byteresponse, "utf-8"))
+                        except Exception as e:
+                            print('Exception occured in sending', e)
+
+                else:  # Nothing found in query
+                    byteresponse = "Error - no match found with query"
+                    app.terminalFunction("ER", byteresponse)
+                    app.mySocket.write(bytes(byteresponse, "utf-8"))
+        else:
+            app.terminalFunction(
+                "--", "Error - no device emulator file has been loaded"
+            )             
+
+    def connection_lost(self, exc):
+        msg = "Client {} disconnected".format(self.socketdetails[0])
+        app.colorlabel.config(background=app.colorList[0])
+        app.terminalFunction("--", msg)
+        app.port["connected"] = 0
+
+    def connection_close():
+        app.mySocket.close()
+        app.mySocket = None
+        app.port["connected"] = 0
 
 async def main():
     await run_tk(root)
