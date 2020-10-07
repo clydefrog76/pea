@@ -565,13 +565,19 @@ class Window(Frame):
 
             self.portentry.config(state="normal")
             self.portbutton.config(text="Open Port")
-            self.mySocket.close()
             self.port["listen"] = 0
 
             if self.conn:
                 self.buffer = b""
                 self.conn.close()
                 self.conn = None
+
+            try:
+                self.mySocket.shutdown(socket.SHUT_RDWR)               
+            except:
+                pass
+            finally:
+                self.mySocket.close()
 
     def client_thread(self, action=None):
         """ a threaded function for individual sockets and their connections """

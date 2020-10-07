@@ -320,7 +320,7 @@ class Window(Frame):
             except Exception as e:
                 print('Exception occured in customFunc', e)            
 
-            if byteresponse and self.conn:
+            if byteresponse and self.mySocket:
                 byteresponsesend = (
                     byteresponse.encode("latin-1")
                     .decode("unicode_escape")
@@ -328,7 +328,7 @@ class Window(Frame):
                 )
 
                 self.terminalFunction("OU", byteresponsesend)
-                self.conn.send(byteresponsesend)
+                self.mySocket.write(byteresponsesend)
             else:
                 msg = "No TCP connection detected"
                 self.terminalFunction("--", msg)                           
@@ -733,6 +733,7 @@ class SocketServer(asyncio.Protocol):
         msg = "Client {} connected".format(self.socketdetails[0])
         app.colorlabel.config(background=app.colorList[1])
         app.terminalFunction("--", msg)
+        app.disconnectbutton.config(state="active")
 
         if app.commandsList:
             if "ON_CONNECT" in app.commandsList[7][0]["Query"]:
@@ -786,7 +787,7 @@ class SocketServer(asyncio.Protocol):
                 if app.devscript:  # invoke the script (if there is one)
                     try:
                         byteresponse = app.devscript.rxscript(
-                            self.conn, self.buffer
+                            app.mySocket, data
                         )
                     except Exception as e:
                         print('Exception occured in devscript', e)
@@ -821,11 +822,13 @@ class SocketServer(asyncio.Protocol):
         app.colorlabel.config(background=app.colorList[0])
         app.terminalFunction("--", msg)
         app.port["connected"] = 0
+        app.disconnectbutton.config(state="disabled")
 
     def connection_close():
         app.mySocket.close()
         app.mySocket = None
         app.port["connected"] = 0
+        app.disconnectbutton.config(state="disabled")
 
 async def main():
     await run_tk(root)
