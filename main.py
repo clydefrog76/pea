@@ -866,7 +866,7 @@ Programmers: Alexander Teusch
 
         donationsCanvas = Canvas(donationsWindow, width=0, height=0)
         donationsCanvas.pack(expand=YES, fill=BOTH)
-        donationsmsg = '''Although PEA is free, fully open-source and build with the community
+        donationsmsg = '''Although PEA is free, fully open-source and built with the community
 in mind, we the developers still have spend dozends of hours in\ncreating and testing this tool.\n
 If you like this great tool and you wish to support us and contribute
 to future improvents, updates or even just some beer money, please

@@ -36,9 +36,7 @@ class Window(Frame):
         
         self.port = {"listen": 0, "connected": 0}
         self.mySocket = None
-        #self.buffer = None
-        #self.mySocket = None
-        #self.running = True        
+        self.loop = None      
 
 # menu bar section ----------------------------------------------------
 
@@ -671,7 +669,7 @@ Programmers: Alexander Teusch
 
         donationsCanvas = Canvas(donationsWindow, width=0, height=0)
         donationsCanvas.pack(expand=YES, fill=BOTH)
-        donationsmsg = '''Although PEA is free, fully open-source and build with the community
+        donationsmsg = '''Although PEA is free, fully open-source and built with the community
 in mind, we the developers still have spend dozends of hours in\ncreating and testing this tool.\n
 If you like this great tool and you wish to support us and contribute
 to future improvents, updates or even just some beer money, please
@@ -704,8 +702,8 @@ feel free to donate ANY amount you like, big or small to:'''
                 self.portentry.config(state="disabled")   
 
                 try:
-                    loop = asyncio.get_running_loop()
-                    self.sock = await loop.create_server(lambda: SocketServer(),'127.0.0.1', int(self.portentry.get()))
+                    self.loop = asyncio.get_running_loop()
+                    self.sock = await self.loop.create_server(lambda: SocketServer(),'127.0.0.1', int(self.portentry.get()))
                 except Exception as e:
                     print(e)                        
 
@@ -724,7 +722,6 @@ feel free to donate ANY amount you like, big or small to:'''
             SocketServer.connection_close()
 
 class SocketServer(asyncio.Protocol):
-    
     def connection_made(self, transport):
         self.socketdetails = transport.get_extra_info('sockname')
         app.port["connected"] = self.socketdetails[1]
@@ -838,8 +835,8 @@ def on_closing():
 
     if messagebox.askokcancel("Exit PEA", "Do you want to quit?"):
         root.destroy()
-        num = os.getpid()
-        os.system("taskkill /f /pid {}".format(num))
+        #num = os.getpid()
+        #os.system("taskkill /f /pid {}".format(num))
 
 root = Tk()
 root.geometry("930x720")
@@ -850,5 +847,4 @@ app = Window(root)
 mystyle = ttk.Style()
 mystyle.theme_use("vista")  # classic,default,clam,winnative,vista,xpnative,alt
 
-if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(main())
+asyncio.run(main())
