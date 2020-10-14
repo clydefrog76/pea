@@ -1,5 +1,5 @@
 import tkinter.ttk as ttk
-from tkinter import Tk, filedialog, messagebox, Text, Canvas, Frame, Menu, PhotoImage, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, X, Toplevel, IntVar, StringVar, TclError
+from tkinter import Tk, filedialog, messagebox, VERTICAL, TRUE, FALSE, Text, Listbox, Canvas, Frame, Menu, PhotoImage, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Y, X, Toplevel, IntVar, StringVar, TclError
 from tkinter.filedialog import askopenfilename
 import os, socket, sys, json, time, ast, datetime, binascii
 import asyncio
@@ -561,7 +561,7 @@ class Window(Frame):
         def appendCommands():
             ''' adds new command fields '''
 
-            entryframe = Frame(jsoneditorWindow)        
+            entryframe = Frame(mylist)        
             entryframe.pack(fill=BOTH)
             self.entryframes.append(entryframe)
 
@@ -624,7 +624,7 @@ class Window(Frame):
                 ''' opens existing file '''
 
                 fname = filedialog.askopenfilename(filetypes=(("Sim files", "*.JSON"), ("All files", "*.*") ))
-                path = os.path.dirname(os.path.abspath(fname))
+                #path = os.path.dirname(os.path.abspath(fname))
                 
                 ''' Open the simulation json file '''
                 try:
@@ -780,15 +780,20 @@ class Window(Frame):
 
         commandsframe = Frame(jsoneditorWindow)        
         commandsframe.pack(fill=BOTH)
-
         commandlabel = ttk.Label(commandsframe, text='Description')
         commandlabel.pack(side=LEFT, padx=5, pady=5, expand=1)
-
         querylabel = ttk.Label(commandsframe, text='Query')
         querylabel.pack(side=LEFT, padx=5, pady=5, expand=1)
-
         responselabel = ttk.Label(commandsframe, text='Response')
-        responselabel.pack(side=LEFT, padx=5, pady=5, expand=1)    
+        responselabel.pack(side=LEFT, padx=5, pady=5, expand=1)  
+
+        canvasframe = Frame(jsoneditorWindow)        
+        scroll = ttk.Scrollbar(canvasframe, orient=VERTICAL)
+        mylist = Listbox(canvasframe, width=700, height=200, yscrollcommand=scroll.set)
+        scroll.config(command=mylist.yview)
+        canvasframe.pack(fill=BOTH)
+        mylist.pack(side=LEFT, fill=BOTH, expand=TRUE)
+        scroll.pack(side=RIGHT, fill=Y)
 
         spinnerFunction('new')           
 
