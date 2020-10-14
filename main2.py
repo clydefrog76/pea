@@ -48,7 +48,7 @@ class Window(Frame):
         menubar.add_cascade(label="File", menu=filemenu)
 
         editmenu = Menu(menubar, tearoff=0)
-        editmenu.add_command(label="Emulator JSON Editor", command=self.hello)
+        editmenu.add_command(label="Emulator JSON Editor", command=self.jsoneditorWindow)
         editmenu.add_separator()
         editmenu.add_command(label="Emulator Script Editor", command=self.hello)
         menubar.add_cascade(label="Edit", menu=editmenu)        
@@ -522,6 +522,21 @@ class Window(Frame):
         else:
             for line in self.terminalbox.get("1.0", "end-1c").splitlines():
                 self.filterbox.insert(END, "{}\n".format(line))
+
+    def jsoneditorWindow(self):
+        """ opens a new JSON editor window """
+         
+        def on_jsoneditorclosing():
+            """ kills the JSON editor window """
+
+            jsoneditorWindow.destroy()
+
+        jsoneditorWindow = Toplevel()
+        jsoneditorWindow.geometry("505x429+{}+{}".format(root.winfo_rootx()+205, root.winfo_rooty()+95))
+        jsoneditorWindow.wm_title("JSON Editor")
+        jsoneditorWindow.resizable(width=False, height=False)
+        jsoneditorWindow.pack_propagate(True)
+        jsoneditorWindow.protocol("WM_DELETE_WINDOW", on_jsoneditorclosing)
 
     def asciihexWindow(self):
         """ opens a new ASCII HEX window """
