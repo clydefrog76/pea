@@ -1,5 +1,5 @@
 import tkinter.ttk as ttk
-from tkinter import Tk, messagebox, Text, Canvas, Frame, Menu, PhotoImage, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Toplevel, StringVar, TclError
+from tkinter import Tk, filedialog, messagebox, Text, Canvas, Frame, Menu, PhotoImage, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, X, Toplevel, IntVar, StringVar, TclError
 from tkinter.filedialog import askopenfilename
 import os, socket, sys, json, time, ast, datetime, binascii
 import asyncio
@@ -529,14 +529,268 @@ class Window(Frame):
         def on_jsoneditorclosing():
             """ kills the JSON editor window """
 
-            jsoneditorWindow.destroy()
+            jsoneditorWindow.destroy() 
 
         jsoneditorWindow = Toplevel()
-        jsoneditorWindow.geometry("505x429+{}+{}".format(root.winfo_rootx()+205, root.winfo_rooty()+95))
+        jsoneditorWindow.geometry("800x600+{}+{}".format(root.winfo_rootx()+205, root.winfo_rooty()+95))
         jsoneditorWindow.wm_title("JSON Editor")
         jsoneditorWindow.resizable(width=False, height=False)
         jsoneditorWindow.pack_propagate(True)
-        jsoneditorWindow.protocol("WM_DELETE_WINDOW", on_jsoneditorclosing)
+        jsoneditorWindow.protocol("WM_DELETE_WINDOW", on_jsoneditorclosing)       
+
+        self.outfileName = str()
+        self.entryframes = list()
+        self.commandlist = list()
+        self.querylist = list()
+        self.responselist = list()                      
+
+        def spinnerFunction(mode):
+            ''' updates spinner '''
+
+            if int(spinnerbox.get()) > len(self.entryframes):
+                appendCommands()
+            
+            elif int(spinnerbox.get()) < len(self.entryframes):
+                removeCommands()       
+
+            if mode == 'new':
+                self.commandlist[0].insert(0, 'ON_CONNECT')
+                self.querylist[0].insert(0, 'ON_CONNECT')
+                self.responselist[0].insert(0, 'Device is connected')                         
+
+        def appendCommands():
+            ''' adds new command fields '''
+
+            entryframe = Frame(jsoneditorWindow)        
+            entryframe.pack(fill=BOTH)
+            self.entryframes.append(entryframe)
+
+            commandentry = ttk.Entry(entryframe)
+            commandentry.config(font=("consolas", 10))
+            commandentry.pack(side=LEFT, padx=5, pady=5, fill=X, expand=1)
+            self.commandlist.append(commandentry)
+
+            queryentry = ttk.Entry(entryframe)
+            queryentry.config(font=("consolas", 10))
+            queryentry.pack(side=LEFT, padx=5, pady=5, fill=X, expand=1)
+            self.querylist.append(queryentry)
+
+            responseentry = ttk.Entry(entryframe)
+            responseentry.config(font=("consolas", 10))
+            responseentry.pack(side=LEFT, padx=5, pady=5, fill=X, expand=1)
+            self.responselist.append(responseentry) 
+        
+        def removeCommands():
+            ''' removes the last command fields '''
+            
+            self.entryframes[-1].destroy()
+            del self.entryframes[-1]
+            del self.commandlist[-1]
+            del self.querylist[-1]
+            del self.responselist[-1]
+
+        def newFile():
+            ''' clears all fields '''
+            
+            fileentry.delete(0, END)
+            manufacturerentry.delete(0, END)
+            modelentry.delete(0, END)
+            categoryentry.delete(0, END)
+            versionentry.delete(0, END)
+            versionentry.insert(0, '1_0_0_0')
+            jsonportentry.delete(0, END)
+            delayentry.delete(0, END)
+            delayentry.insert(0, 0.1)
+            scriptbool.set(False)
+            spinnerbox.set('1')
+            self.commandlist[0].delete(0, END)
+            self.querylist[0].delete(0, END)
+            self.responselist[0].delete(0, END)            
+            self.commandlist[0].insert(0, 'ON_CONNECT')
+            self.querylist[0].insert(0, 'ON_CONNECT')
+            self.responselist[0].insert(0, 'Device is connected')
+
+            for idx,entry in enumerate(self.entryframes):
+                if idx > 0:
+                    entry.destroy()  
+
+            while len(self.entryframes) > 1:
+                self.entryframes = self.entryframes[:-1]
+                self.commandlist = self.commandlist[:-1]
+                self.querylist = self.querylist[:-1]
+                self.responselist = self.responselist[:-1]
+
+        def openFile():
+                ''' opens existing file '''
+
+                fname = filedialog.askopenfilename(filetypes=(("Sim files", "*.JSON"), ("All files", "*.*") ))
+                path = os.path.dirname(os.path.abspath(fname))
+                
+                ''' Open the simulation json file '''
+                try:
+                    with open(fname) as data_file:    
+                        data = json.load(data_file)
+
+                        newFile()
+
+                        if data:
+                            manufacturerentry.delete(0, END)
+                            modelentry.delete(0, END)
+                            categoryentry.delete(0, END)
+                            versionentry.delete(0, END)
+                            jsonportentry.delete(0, END)
+                            delayentry.delete(0, END)
+                            fileentry.insert(0, str(fname))
+                            manufacturerentry.insert(0, str(data[0]['Manufacturer']))
+                            modelentry.insert(0, str(data[1]['Model']))
+                            categoryentry.insert(0, str(data[2]['Category']))
+                            versionentry.insert(0, str(data[3]['Version']))
+                            jsonportentry.insert(0, int(data[4]['Port']))
+                            delayentry.insert(0, float(data[5]['Delay']))
+                            scriptbool.set(data[6]['Script'])   
+                            spinnerbox.set(str(len(data[7])))
+
+                            for idx,data in enumerate(data[7]):
+                                if idx == 0:
+                                    self.commandlist[0].insert(0, data['Description'])
+                                    self.querylist[0].insert(0, data['Query'].encode('latin-1').decode())
+                                    self.responselist[0].insert(0, data['Response'].encode('latin-1').decode())                          
+                                else:
+                                    appendCommands()
+                                    self.commandlist[idx].insert(0, data['Description'])
+                                    self.querylist[idx].insert(0, data['Query'].encode('latin-1').decode())
+                                    self.responselist[idx].insert(0, data['Response'].encode('latin-1').decode())                          
+
+                except Exception as e:
+                    print('Error opening sim file:',e)                 
+
+        def saveFile():
+            ''' saves current file '''
+
+            if manufacturerentry.get() and modelentry.get() and categoryentry.get() and jsonportentry.get() and self.commandlist[0].get()\
+                and self.querylist[0].get() and self.responselist[0].get():
+                
+                manu = str(manufacturerentry.get())[:4].lower().replace(" ", "")
+                mode = str(modelentry.get())[:6].lower().replace(" ", "")
+                vers = str(versionentry.get())                
+                self.outfileName = '{}_{}_{}.json'.format(manu, mode, vers)
+                
+                outfile = filedialog.asksaveasfile(mode='w', initialfile=self.outfileName, title="Save the file", filetypes=(("json files","*.json"),("all files","*.*")))
+                
+                if outfile:
+                    data = []
+                    data.append({"Manufacturer":str(manufacturerentry.get())})
+                    data.append({"Model":str(modelentry.get())})
+                    data.append({"Category":str(categoryentry.get())})
+                    data.append({"Version":str(versionentry.get())})
+                    data.append({"Port":int(jsonportentry.get())})
+                    data.append({"Delay":float(delayentry.get())})
+                    data.append({"Script":bool(scriptbool.get())})
+                    data.append([])
+
+                    for idx, count in enumerate(self.entryframes):                   
+                        cmd = str(self.commandlist[idx].get())
+                        que = str(self.querylist[idx].get()).encode('latin-1').decode()
+                        res = str(self.responselist[idx].get()).encode('latin-1').decode()
+                        data[7].append({"Description":cmd, "Query":que, "Response":res})                
+
+                    outfile.write(json.dumps(data, sort_keys=True, indent=4).encode('latin-1').decode())
+                    outfile.close()
+            else:
+                messagebox.showerror("Cannot Save", "Please enter all fields!")                                                        
+
+        jsonmenu = Menu(jsoneditorWindow)
+        jsoneditorWindow.config(menu=jsonmenu)
+        
+        filemenu = Menu(jsonmenu, tearoff=0)
+        jsonmenu.add_cascade(label="File", menu=filemenu)
+        filemenu.add_command(label="New File", command=newFile)
+        filemenu.add_separator()
+        filemenu.add_command(label="Open Existing", command=openFile)
+        filemenu.add_command(label="Save To Disk", command=saveFile)
+        filemenu.add_separator()
+        filemenu.add_command(label="Exit Editor", command=on_jsoneditorclosing) 
+
+        fileframe = Frame(jsoneditorWindow)        
+        fileframe.pack(fill=BOTH)
+        filelabel = ttk.Label(fileframe, width=18, text='Filename')
+        filelabel.pack(side=LEFT, padx=5, pady=5)
+        fileentry = ttk.Entry(fileframe, width=75)
+        fileentry.pack(side=LEFT, padx=5, pady=5)
+
+        manufacturerframe = Frame(jsoneditorWindow)        
+        manufacturerframe.pack(fill=BOTH)
+        manufacturerlabel = ttk.Label(manufacturerframe, width=18, text='Manufacturer')
+        manufacturerlabel.pack(side=LEFT, padx=5, pady=5)
+        manufacturerentry = ttk.Entry(manufacturerframe, width=50)
+        manufacturerentry.pack(side=LEFT, padx=5, pady=5) 
+
+        modelframe = Frame(jsoneditorWindow)        
+        modelframe.pack(fill=BOTH)        
+        modellabel = ttk.Label(modelframe, width=18, text='Model')
+        modellabel.pack(side=LEFT, padx=5, pady=5)
+        modelentry = ttk.Entry(modelframe, width=50)
+        modelentry.pack(side=LEFT, padx=5, pady=5)            
+
+        categoryframe = Frame(jsoneditorWindow)        
+        categoryframe.pack(fill=BOTH)
+        categorylabel = ttk.Label(categoryframe, width=18, text='Category')
+        categorylabel.pack(side=LEFT, padx=5, pady=5)
+        categoryentry = ttk.Entry(categoryframe, width=50)
+        categoryentry.pack(side=LEFT, padx=5, pady=5) 
+
+        versionframe = Frame(jsoneditorWindow)        
+        versionframe.pack(fill=BOTH)        
+        versionlabel = ttk.Label(versionframe, width=18, text='File Version')
+        versionlabel.pack(side=LEFT, padx=5, pady=5)
+        versionentry = ttk.Entry(versionframe, width=10)
+        versionentry.insert(0, '1_0_0_0')
+        versionentry.pack(side=LEFT, padx=5, pady=5, fill=X) 
+
+        portframe = Frame(jsoneditorWindow)        
+        portframe.pack(fill=BOTH)        
+        portlabel = ttk.Label(portframe, width=18, text='TCP Port')
+        portlabel.pack(side=LEFT, padx=5, pady=5)
+        jsonportentry = ttk.Entry(portframe, width=10)
+        jsonportentry.pack(side=LEFT, padx=5, pady=5, fill=X)
+
+        delayframe = Frame(jsoneditorWindow)        
+        delayframe.pack(fill=BOTH)
+        delaylabel = ttk.Label(delayframe, width=18, text='Response Delay')
+        delaylabel.pack(side=LEFT, padx=5, pady=5)
+        delayentry = ttk.Entry(delayframe, width=10)
+        delayentry.insert(0, '0.1')
+        delayentry.pack(side=LEFT, padx=5, pady=5, fill=X) 
+
+        scriptframe = Frame(jsoneditorWindow)        
+        scriptframe.pack(fill=BOTH)        
+        scriptlabel = ttk.Label(scriptframe, width=18, text='Script?')
+        scriptlabel.pack(side=LEFT, padx=5, pady=5)
+        scriptbool = IntVar()
+        scriptentry = ttk.Checkbutton(scriptframe, variable=scriptbool)
+        scriptentry.pack(side=LEFT, pady=5) 
+
+        spinnerframe = Frame(jsoneditorWindow)        
+        spinnerframe.pack(fill=BOTH)
+        spinnerlabel = ttk.Label(spinnerframe, width=18, text='# Commands')
+        spinnerlabel.pack(side=LEFT, padx=5, pady=5) 
+        spinnerbox = ttk.Spinbox(spinnerframe, width=5, from_=1, to=20, command=lambda: spinnerFunction(None))
+        spinnerbox.set('1')
+        spinnerbox.pack(side=LEFT, padx=5, pady=5)            
+
+        commandsframe = Frame(jsoneditorWindow)        
+        commandsframe.pack(fill=BOTH)
+
+        commandlabel = ttk.Label(commandsframe, text='Description')
+        commandlabel.pack(side=LEFT, padx=5, pady=5, expand=1)
+
+        querylabel = ttk.Label(commandsframe, text='Query')
+        querylabel.pack(side=LEFT, padx=5, pady=5, expand=1)
+
+        responselabel = ttk.Label(commandsframe, text='Response')
+        responselabel.pack(side=LEFT, padx=5, pady=5, expand=1)    
+
+        spinnerFunction('new')           
 
     def asciihexWindow(self):
         """ opens a new ASCII HEX window """
