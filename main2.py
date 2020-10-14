@@ -720,6 +720,7 @@ feel free to donate ANY amount you like, big or small to:'''
             self.port["listen"] = 0      
 
             SocketServer.connection_close()
+            self.sock.close()
 
 class SocketServer(asyncio.Protocol):
     def connection_made(self, transport):
