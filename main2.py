@@ -1097,7 +1097,8 @@ class SocketServer(asyncio.Protocol):
         app.disconnectbutton.config(state="disabled")
 
     def connection_close():
-        app.mySocket.close()
+        if app.mySocket:
+            app.mySocket.close()
         app.mySocket = None
         app.port["connected"] = 0
         app.disconnectbutton.config(state="disabled")
