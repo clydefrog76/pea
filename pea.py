@@ -241,16 +241,15 @@ class Window(Frame):
             on all operating systems
         '''
         try:
-            self.scriptName
             fileToEdit = "{}\{}.py".format(self.path, self.scriptName)
-            runningOn = platform.system()
-
-            if runningOn == 'Darwen':
-                os.system("open " + shlex.quote(fileToEdit))
-            elif runningOn == 'Windows':
-                os.system("start " + fileToEdit)
-            elif runningOn == 'Linux':
-                os.system("open " + shlex.quote(fileToEdit))
+            if os.path.isfile(fileToEdit) :
+                runningOn = platform.system()
+                if runningOn == 'Darwen':
+                    os.system("open " + shlex.quote(fileToEdit))
+                elif runningOn == 'Windows':
+                    os.system("start " + fileToEdit)
+                elif runningOn == 'Linux':
+                    os.system("open " + shlex.quote(fileToEdit))
         except:
             pass
 
