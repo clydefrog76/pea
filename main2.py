@@ -240,15 +240,19 @@ class Window(Frame):
             Opens the script file for editing in the native editor
             on all operating systems
         '''
-        fileToEdit = "{}\{}.py".format(self.path, self.scriptName)
-        runningOn = platform.system()
+        try:
+            self.scriptName
+            fileToEdit = "{}\{}.py".format(self.path, self.scriptName)
+            runningOn = platform.system()
 
-        if runningOn == 'Darwen':
-            os.system("open " + shlex.quote(fileToEdit))
-        elif runningOn == 'Windows':
-            os.system("start " + fileToEdit)
-        elif runningOn == 'Linux':
-            os.system("open " + shlex.quote(fileToEdit))
+            if runningOn == 'Darwen':
+                os.system("open " + shlex.quote(fileToEdit))
+            elif runningOn == 'Windows':
+                os.system("start " + fileToEdit)
+            elif runningOn == 'Linux':
+                os.system("open " + shlex.quote(fileToEdit))
+        except:
+            pass
 
     def browseFunction(self):
         """ declare the function when pressed on the broswe button """
