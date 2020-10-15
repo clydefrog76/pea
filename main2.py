@@ -17,6 +17,7 @@ from tkinter import Tk, filedialog, messagebox, VERTICAL, TRUE, FALSE, Text, Lis
 from tkinter.filedialog import askopenfilename
 import os, socket, sys, json, time, ast, datetime, binascii
 import asyncio
+import platform, subprocess
 
 async def run_tk(root, interval=0.01):
     '''
@@ -64,7 +65,7 @@ class Window(Frame):
         editmenu = Menu(menubar, tearoff=0)
         editmenu.add_command(label="Emulator JSON Editor", command=self.jsoneditorWindow)
         editmenu.add_separator()
-        editmenu.add_command(label="Emulator Script Editor", command=self.hello)
+        editmenu.add_command(label="Emulator Script Editor", command=self.launchScriptEditor)
         menubar.add_cascade(label="Edit", menu=editmenu)        
 
         toolsmenu = Menu(menubar, tearoff=0)
@@ -234,8 +235,21 @@ class Window(Frame):
 
     # main functions ---------------------------------------------------
 
-    def hello(self):
-        pass       
+    def launchScriptEditor(self):
+        '''
+            Opens the script file for editing in the native editor
+            on all operating systems
+        '''
+        fileToEdit = "{}\{}.py".format(self.path, self.scriptName)
+        runningOn = platform.system()
+
+        if runningOn == 'Darwen':
+            subprocess.call(['TextEdit', fileToEdit])
+        elif runningOn == 'Windows':
+            subprocess.call(['Notepad', fileToEdit])
+        elif runningOn == 'Linux':
+            subprocess.call(["gedit", fileToEdit])
+   
 
     def browseFunction(self):
         """ declare the function when pressed on the broswe button """
@@ -250,6 +264,8 @@ class Window(Frame):
 
         path = os.path.dirname(os.path.abspath(fname))
         scriptName = os.path.basename(fname)[:-5]
+        self.scriptName = scriptName
+        self.path = path
 
         if fname:
             try:
