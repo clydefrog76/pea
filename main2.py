@@ -626,11 +626,13 @@ class Window(Frame):
         def openFile():
                 ''' opens existing file '''
 
+                root.wm_attributes('-topmost', 1)
                 fname = filedialog.askopenfilename(filetypes=(("Sim files", "*.JSON"), ("All files", "*.*") ))
                 #path = os.path.dirname(os.path.abspath(fname))
                 
                 ''' Open the simulation json file '''
                 try:
+                    root.wm_attributes('-topmost', 0)
                     with open(fname) as data_file:    
                         data = json.load(data_file)
 
@@ -654,7 +656,6 @@ class Window(Frame):
 
                             for idx,data in enumerate(data[7]):
                                 if idx == 0:
-                                    print(idx)
                                     self.commandlist[0].insert(0, data['Description'])
                                     self.querylist[0].insert(0, data['Query'].encode('latin-1').decode())
                                     self.responselist[0].insert(0, data['Response'].encode('latin-1').decode())                          
@@ -665,7 +666,8 @@ class Window(Frame):
                                     self.responselist[idx].insert(0, data['Response'].encode('latin-1').decode())                          
 
                 except Exception as e:
-                    print('Error opening sim file:',e)                 
+                    print('Error opening sim file:',e)
+                    root.wm_attributes('-topmost', 0)                 
 
         def saveFile():
             ''' saves current file '''
@@ -1153,6 +1155,7 @@ def on_closing():
 root = Tk()
 root.geometry("930x720")
 root.resizable(width=False, height=False)
+root.wm_attributes('-topmost', 0)
 root.call("wm", "iconphoto", root._w, PhotoImage(file="assets/icon.png"))    
 app = Window(root)
 
