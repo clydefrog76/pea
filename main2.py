@@ -1,5 +1,5 @@
 import tkinter.ttk as ttk
-from tkinter import Tk, filedialog, messagebox, VERTICAL, TRUE, FALSE, Text, Listbox, Canvas, Frame, Menu, PhotoImage, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Y, X, Toplevel, IntVar, StringVar, TclError
+from tkinter import Tk, filedialog, messagebox, VERTICAL, TRUE, FALSE, Text, Listbox, Canvas, Frame, Menu, PhotoImage, NW, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Y, X, Toplevel, IntVar, StringVar, TclError
 from tkinter.filedialog import askopenfilename
 import os, socket, sys, json, time, ast, datetime, binascii
 import asyncio
@@ -532,7 +532,7 @@ class Window(Frame):
             jsoneditorWindow.destroy() 
 
         jsoneditorWindow = Toplevel()
-        jsoneditorWindow.geometry("800x600+{}+{}".format(root.winfo_rootx()+205, root.winfo_rooty()+95))
+        jsoneditorWindow.geometry("800x602+{}+{}".format(root.winfo_rootx()+205, root.winfo_rooty()+95))
         jsoneditorWindow.wm_title("JSON Editor")
         jsoneditorWindow.resizable(width=False, height=False)
         jsoneditorWindow.pack_propagate(True)
@@ -561,21 +561,21 @@ class Window(Frame):
         def appendCommands():
             ''' adds new command fields '''
 
-            entryframe = Frame(mylist)        
+            entryframe = Frame(scrollframe.interior)        
             entryframe.pack(fill=BOTH)
             self.entryframes.append(entryframe)
 
-            commandentry = ttk.Entry(entryframe)
+            commandentry = ttk.Entry(entryframe, width=35)
             commandentry.config(font=("consolas", 10))
             commandentry.pack(side=LEFT, padx=5, pady=5, fill=X, expand=1)
             self.commandlist.append(commandentry)
 
-            queryentry = ttk.Entry(entryframe)
+            queryentry = ttk.Entry(entryframe, width=35)
             queryentry.config(font=("consolas", 10))
             queryentry.pack(side=LEFT, padx=5, pady=5, fill=X, expand=1)
             self.querylist.append(queryentry)
 
-            responseentry = ttk.Entry(entryframe)
+            responseentry = ttk.Entry(entryframe, width=35)
             responseentry.config(font=("consolas", 10))
             responseentry.pack(side=LEFT, padx=5, pady=5, fill=X, expand=1)
             self.responselist.append(responseentry) 
@@ -697,8 +697,8 @@ class Window(Frame):
                     outfile.write(json.dumps(data, sort_keys=True, indent=4).encode('latin-1').decode())
                     outfile.close()
             else:
-                messagebox.showerror("Cannot Save", "Please enter all fields!")                                                        
-
+                messagebox.showerror("Cannot Save", "Please enter all fields!") 
+  
         jsonmenu = Menu(jsoneditorWindow)
         jsoneditorWindow.config(menu=jsonmenu)
         
@@ -787,15 +787,12 @@ class Window(Frame):
         responselabel = ttk.Label(commandsframe, text='Response')
         responselabel.pack(side=LEFT, padx=5, pady=5, expand=1)  
 
-        canvasframe = Frame(jsoneditorWindow)        
-        scroll = ttk.Scrollbar(canvasframe, orient=VERTICAL)
-        mylist = Listbox(canvasframe, width=700, height=200, yscrollcommand=scroll.set)
-        scroll.config(command=mylist.yview)
-        canvasframe.pack(fill=BOTH)
-        mylist.pack(side=LEFT, fill=BOTH, expand=TRUE)
-        scroll.pack(side=RIGHT, fill=Y)
+        scrollframe = VerticalScrolledFrame(jsoneditorWindow)
+        scrollframe.pack()
+        scrolllabel = ttk.Label(jsoneditorWindow, text="More than 8 JSON commands will activate the scrollbar")
+        scrolllabel.pack(pady=5)        
 
-        spinnerFunction('new')           
+        spinnerFunction('new')
 
     def asciihexWindow(self):
         """ opens a new ASCII HEX window """
@@ -1096,12 +1093,48 @@ class SocketServer(asyncio.Protocol):
         app.port["connected"] = 0
         app.disconnectbutton.config(state="disabled")
 
-    def connection_close():
+    def connection_close(param=None):
         if app.mySocket:
             app.mySocket.close()
         app.mySocket = None
         app.port["connected"] = 0
         app.disconnectbutton.config(state="disabled")
+
+class VerticalScrolledFrame(Frame):
+    def __init__(self, parent, *args, **kw):
+        Frame.__init__(self, parent, *args, **kw)            
+
+        # create a canvas object and a vertical scrollbar for scrolling it
+        vscrollbar = ttk.Scrollbar(self, orient=VERTICAL)
+        vscrollbar.pack(fill=Y, side=RIGHT, expand=FALSE)
+        canvas = Canvas(self, bd=0, highlightthickness=0, yscrollcommand=vscrollbar.set)
+        canvas.pack(side=LEFT, fill=BOTH, expand=TRUE)
+        vscrollbar.config(command=canvas.yview)
+
+        # reset the view
+        canvas.xview_moveto(0)
+        canvas.yview_moveto(0)
+
+        # create a frame inside the canvas which will be scrolled with it
+        self.interior = interior = Frame(canvas)
+        interior_id = canvas.create_window(0, 0, window=interior, anchor=NW)
+
+        # track changes to the canvas and frame width and sync them,
+        # also updating the scrollbar
+        def _configure_interior(event):
+            # update the scrollbars to match the size of the inner frame
+            size = (interior.winfo_reqwidth(), interior.winfo_reqheight())
+            canvas.config(scrollregion="0 0 %s %s" % size)
+            if interior.winfo_reqwidth() != canvas.winfo_width():
+                # update the canvas's width to fit the inner frame
+                canvas.config(width=interior.winfo_reqwidth())
+        interior.bind('<Configure>', _configure_interior)
+
+        def _configure_canvas(event):
+            if interior.winfo_reqwidth() != canvas.winfo_width():
+                # update the inner frame's width to fill the canvas
+                canvas.itemconfigure(interior_id, width=canvas.winfo_width())
+        canvas.bind('<Configure>', _configure_canvas)        
 
 async def main():
     await run_tk(root)
