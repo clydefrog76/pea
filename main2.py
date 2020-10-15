@@ -532,11 +532,12 @@ class Window(Frame):
             jsoneditorWindow.destroy() 
 
         jsoneditorWindow = Toplevel()
-        jsoneditorWindow.geometry("800x602+{}+{}".format(root.winfo_rootx()+205, root.winfo_rooty()+95))
+        jsoneditorWindow.geometry("800x602+{}+{}".format(root.winfo_rootx()+57, root.winfo_rooty()+15))
         jsoneditorWindow.wm_title("JSON Editor")
         jsoneditorWindow.resizable(width=False, height=False)
         jsoneditorWindow.pack_propagate(True)
-        jsoneditorWindow.protocol("WM_DELETE_WINDOW", on_jsoneditorclosing)       
+        jsoneditorWindow.protocol("WM_DELETE_WINDOW", on_jsoneditorclosing)     
+        jsoneditorWindow.attributes('-topmost', True)  
 
         self.outfileName = str()
         self.entryframes = list()
@@ -597,12 +598,14 @@ class Window(Frame):
             modelentry.delete(0, END)
             categoryentry.delete(0, END)
             versionentry.delete(0, END)
-            versionentry.insert(0, '1_0_0_0')
             jsonportentry.delete(0, END)
             delayentry.delete(0, END)
             delayentry.insert(0, 0.1)
             scriptbool.set(False)
+            
+            versionentry.insert(0, '1_0_0_0')
             spinnerbox.set('1')
+
             self.commandlist[0].delete(0, END)
             self.querylist[0].delete(0, END)
             self.responselist[0].delete(0, END)            
@@ -631,15 +634,14 @@ class Window(Frame):
                     with open(fname) as data_file:    
                         data = json.load(data_file)
 
-                        newFile()
-
                         if data:
-                            manufacturerentry.delete(0, END)
-                            modelentry.delete(0, END)
-                            categoryentry.delete(0, END)
+                            newFile()   
                             versionentry.delete(0, END)
-                            jsonportentry.delete(0, END)
                             delayentry.delete(0, END)
+                            self.commandlist[0].delete(0, END)
+                            self.querylist[0].delete(0, END)
+                            self.responselist[0].delete(0, END)                                                      
+                            
                             fileentry.insert(0, str(fname))
                             manufacturerentry.insert(0, str(data[0]['Manufacturer']))
                             modelentry.insert(0, str(data[1]['Model']))
@@ -652,6 +654,7 @@ class Window(Frame):
 
                             for idx,data in enumerate(data[7]):
                                 if idx == 0:
+                                    print(idx)
                                     self.commandlist[0].insert(0, data['Description'])
                                     self.querylist[0].insert(0, data['Query'].encode('latin-1').decode())
                                     self.responselist[0].insert(0, data['Response'].encode('latin-1').decode())                          
