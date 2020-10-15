@@ -1,0 +1,45 @@
+[
+    {
+        "Manufacturer": "Template"
+    },
+    {
+        "Model": "Device"
+    },
+    {
+        "Category": "Basic Example"
+    },
+    {
+        "Version": "1_0_0_1"
+    },
+    {
+        "Port": 1024
+    },
+    {
+        "Delay": 0.3
+    },
+    {
+        "Script": false
+    },
+    [
+        {
+            "Description": "ON_CONNECT",
+            "Query": "ON_CONNECT",
+            "Response": "Welcome to PEA, the Python Emulator for Audiovisual devices.\r"
+        },
+        {
+            "Description": "hex command",
+            "Query": "hex",
+            "Response": "\\x68\\x65\\x78\\x61\\x64\\x65\\x63\\x69\\x6d\\x61\\x6c\\x0D\\x0A"
+        },
+        {
+            "Description": "ascii command",
+            "Query": "ascii\r",
+            "Response": "56.3c degrees\r\n"
+        },
+        {
+            "Description": "fsdfsd",
+            "Query": "sdfsdf",
+            "Response": "sdfsdf"
+        }
+    ]
+]
