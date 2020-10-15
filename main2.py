@@ -1,3 +1,17 @@
+"""
+    #PEA
+
+    PEA is a Python Emulator for Audiovisual devices written to aid
+    in the develpment and testing of Audiovisual control projects.
+
+    Code by: 
+        Alex Teusch - alexander.teusch@gmail.com
+        Rupert Powell - rupert@astronoscope.eu
+
+    Version controlled here:
+        https://github.com/clydefrog76/pea
+"""
+
 import tkinter.ttk as ttk
 from tkinter import Tk, filedialog, messagebox, VERTICAL, TRUE, FALSE, Text, Listbox, Canvas, Frame, Menu, PhotoImage, NW, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Y, X, Toplevel, IntVar, StringVar, TclError
 from tkinter.filedialog import askopenfilename
@@ -628,7 +642,6 @@ class Window(Frame):
 
                 root.wm_attributes('-topmost', 1)
                 fname = filedialog.askopenfilename(filetypes=(("Sim files", "*.JSON"), ("All files", "*.*") ))
-                #path = os.path.dirname(os.path.abspath(fname))
                 
                 ''' Open the simulation json file '''
                 try:
