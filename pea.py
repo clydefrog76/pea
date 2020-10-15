@@ -260,7 +260,6 @@ class Window(Frame):
         fname = askopenfilename(
             filetypes=(
                 ("Sim files", "*.JSON"),
-                ("Extron Em files", "*.dpro"),
                 ("All files", "*.*"),
             )
         )
@@ -712,6 +711,7 @@ class Window(Frame):
                 vers = str(versionentry.get())                
                 self.outfileName = '{}_{}_{}.json'.format(manu, mode, vers)
                 
+                root.wm_attributes('-topmost', 1)
                 outfile = filedialog.asksaveasfile(mode='w', initialfile=self.outfileName, title="Save the file", filetypes=(("json files","*.json"),("all files","*.*")))
                 
                 if outfile:
@@ -725,7 +725,7 @@ class Window(Frame):
                     data.append({"Script":bool(scriptbool.get())})
                     data.append([])
 
-                    for idx, count in enumerate(self.entryframes):                   
+                    for idx, count in enumerate(self.entryframes):                  
                         cmd = str(self.commandlist[idx].get())
                         que = str(self.querylist[idx].get()).encode('latin-1').decode()
                         res = str(self.responselist[idx].get()).encode('latin-1').decode()
@@ -733,8 +733,11 @@ class Window(Frame):
 
                     outfile.write(json.dumps(data, sort_keys=True, indent=4).encode('latin-1').decode())
                     outfile.close()
+                    root.wm_attributes('-topmost', 0)
             else:
+                root.wm_attributes('-topmost', 1)
                 messagebox.showerror("Cannot Save", "Please enter all fields!") 
+                root.wm_attributes('-topmost', 0)
   
         jsonmenu = Menu(jsoneditorWindow)
         jsoneditorWindow.config(menu=jsonmenu)
@@ -1027,7 +1030,7 @@ feel free to donate ANY amount you like, big or small to:'''
             self.portbutton.config(text="Open Port")
             self.port["listen"] = 0      
 
-            SocketServer.connection_close()
+            connection_close()
             self.sock.close()
 
 class SocketServer(asyncio.Protocol):
@@ -1130,12 +1133,12 @@ class SocketServer(asyncio.Protocol):
         app.port["connected"] = 0
         app.disconnectbutton.config(state="disabled")
 
-    def connection_close(param=None):
-        if app.mySocket:
-            app.mySocket.close()
-        app.mySocket = None
-        app.port["connected"] = 0
-        app.disconnectbutton.config(state="disabled")
+def connection_close():
+    if app.mySocket:
+        app.mySocket.close()
+    app.mySocket = None
+    app.port["connected"] = 0
+    app.disconnectbutton.config(state="disabled")
 
 class VerticalScrolledFrame(Frame):
     def __init__(self, parent, *args, **kw):
