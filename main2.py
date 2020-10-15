@@ -240,7 +240,7 @@ class Window(Frame):
             Opens the script file for editing in the native editor
             on all operating systems
         '''
-        fileToEdit = "{}\{}.py".format(self.path, self.scriptName)
+        fileToEdit = r"{}\\{}.py".format(self.path, self.scriptName)
         runningOn = platform.system()
 
         if runningOn == 'Darwen':
