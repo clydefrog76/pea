@@ -244,12 +244,11 @@ class Window(Frame):
         runningOn = platform.system()
 
         if runningOn == 'Darwen':
-            subprocess.call(['TextEdit', fileToEdit])
+            os.system("open " + shlex.quote(fileToEdit))
         elif runningOn == 'Windows':
-            subprocess.call(['Notepad', fileToEdit])
+            os.system("start " + fileToEdit)
         elif runningOn == 'Linux':
-            subprocess.call(["gedit", fileToEdit])
-   
+            os.system("open " + shlex.quote(fileToEdit))
 
     def browseFunction(self):
         """ declare the function when pressed on the broswe button """
