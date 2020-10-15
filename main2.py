@@ -256,7 +256,6 @@ class Window(Frame):
         fname = askopenfilename(
             filetypes=(
                 ("Sim files", "*.JSON"),
-                ("Extron Em files", "*.dpro"),
                 ("All files", "*.*"),
             )
         )
