@@ -17,7 +17,7 @@ from tkinter import Tk, filedialog, messagebox, VERTICAL, TRUE, FALSE, Text, Lis
 from tkinter.filedialog import askopenfilename
 import os, socket, sys, json, time, ast, datetime, binascii
 import asyncio
-import platform, subprocess
+import platform, shlex
 
 async def run_tk(root, interval=0.01):
     '''
