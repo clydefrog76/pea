@@ -662,7 +662,7 @@ class Window(Frame):
                 ''' opens existing file '''
 
                 root.wm_attributes('-topmost', 1)
-                fname = filedialog.askopenfilename(filetypes=(("Sim files", "*.JSON"), ("All files", "*.*") ))
+                fname = filedialog.askopenfilename(filetypes=(("Sim files", "*.json"), ("All files", "*.*") ))
                 
                 ''' Open the simulation json file '''
                 try:
