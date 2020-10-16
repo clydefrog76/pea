@@ -937,6 +937,13 @@ class Window(Frame):
         howtoWindow.resizable(width=False, height=False)
         howtoWindow.pack_propagate(True)
         howtoWindow.protocol("WM_DELETE_WINDOW", on_howtoclosing) 
+        howtoCanvas = Canvas(howtoWindow, width=0, height=0)
+        howtoCanvas.pack(expand=YES, fill=BOTH)
+        pealogo = PhotoImage(file='assets/logo.gif')
+        howtoCanvas.pealogo = pealogo
+        howtoCanvas.create_image((10, 10), anchor='nw', image=pealogo)
+        from help import howtomsg
+        howtoCanvas.create_text(10, 150, anchor='nw', font=("Consolas", 10), text=howtomsg)  
 
     def aboutWindow(self):
         """ opens a new About window """
@@ -958,7 +965,7 @@ class Window(Frame):
         pealogo = PhotoImage(file='assets/logo.gif')
         aboutCanvas.pealogo = pealogo
         aboutCanvas.create_image((10, 10), anchor='nw', image=pealogo)
-        aboutmsg = '''PEA: a python written tcp ethernet device emulator\n
+        aboutmsg = '''PEA: a python written tcp ethernet device emulator  \n
 Version: 1.0.0
 Python Version: 3.8.5\n
 Github Repo: https://github.com/clydefrog76/pea\n
