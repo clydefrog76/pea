@@ -1198,7 +1198,9 @@ root.call("wm", "iconphoto", root._w, PhotoImage(file="assets/icon.png"))
 app = Window(root)
 
 mystyle = ttk.Style()
-# VISTA ONLY WORKS UNDER WINDOWS
-mystyle.theme_use("default")  # classic,default,clam,winnative,vista,xpnative,alt
+if sys.platform.startswith('win'):
+    mystyle.theme_use("vista")  # classic,default,clam,winnative,vista,xpnative,alt
+else:
+    mystyle.theme_use("default")
 
 asyncio.run(main())
