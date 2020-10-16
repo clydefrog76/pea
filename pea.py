@@ -241,7 +241,8 @@ class Window(Frame):
             on all operating systems
         '''
         try:
-            fileToEdit = "{}\{}.py".format(self.path, self.scriptName)
+            fileToEdit = "{}/{}.py".format(self.path, self.scriptName)
+            #print(fileToEdit)
             if os.path.isfile(fileToEdit) :
                 runningOn = platform.system()
                 if runningOn == 'Darwen':
@@ -249,8 +250,11 @@ class Window(Frame):
                 elif runningOn == 'Windows':
                     os.system("start " + fileToEdit)
                 elif runningOn == 'Linux':
-                    os.system("open " + shlex.quote(fileToEdit))
+                    os.system("xdg-open " + shlex.quote(fileToEdit))
+                else:
+                    print("Unknown OS!")
         except:
+            print("No script found")
             pass
 
     def browseFunction(self):
@@ -258,7 +262,7 @@ class Window(Frame):
 
         fname = askopenfilename(
             filetypes=(
-                ("Sim files", "*.JSON"),
+                ("Sim files", "*.json"),
                 ("All files", "*.*"),
             )
         )
@@ -1187,13 +1191,14 @@ def on_closing():
         #os.system("taskkill /f /pid {}".format(num))
 
 root = Tk()
-root.geometry("930x720")
+#root.geometry("930x720")
 root.resizable(width=False, height=False)
 root.wm_attributes('-topmost', 0)
 root.call("wm", "iconphoto", root._w, PhotoImage(file="assets/icon.png"))    
 app = Window(root)
 
 mystyle = ttk.Style()
-mystyle.theme_use("vista")  # classic,default,clam,winnative,vista,xpnative,alt
+# VISTA ONLY WORKS UNDER WINDOWS
+mystyle.theme_use("default")  # classic,default,clam,winnative,vista,xpnative,alt
 
 asyncio.run(main())
