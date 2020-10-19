@@ -868,7 +868,7 @@ class Window(Frame):
                     asciioutput.insert(0, 'Character Error')
 
         asciihexWindow = Toplevel()
-        asciihexWindow.geometry("390x138+{}+{}".format(root.winfo_rootx()+262, root.winfo_rooty()+245))
+        asciihexWindow.geometry("+{}+{}".format(root.winfo_rootx()+262, root.winfo_rooty()+245))
         asciihexWindow.wm_title("ASCII - HEX Converter")
         asciihexWindow.resizable(width=False, height=False)
         asciihexWindow.pack_propagate(True)
@@ -937,13 +937,14 @@ class Window(Frame):
         howtoWindow.resizable(width=False, height=False)
         howtoWindow.pack_propagate(True)
         howtoWindow.protocol("WM_DELETE_WINDOW", on_howtoclosing) 
-        howtoCanvas = Canvas(howtoWindow, width=0, height=0)
-        howtoCanvas.pack(expand=YES, fill=BOTH)
-        pealogo = PhotoImage(file='assets/logo.gif')
-        howtoCanvas.pealogo = pealogo
-        howtoCanvas.create_image((10, 10), anchor='nw', image=pealogo)
+        
+        howtoFrame = VerticalScrolledFrame(howtoWindow) 
+        howtoFrame.pack(expand=1, fill=BOTH)
+        
         from help import howtomsg
-        howtoCanvas.create_text(10, 150, anchor='nw', font=("Consolas", 10), text=howtomsg)  
+        howtoText = ttk.Label(howtoFrame.interior, text=howtomsg)
+        howtoText.config(font=("consolas", 10))             
+        howtoText.pack(padx=8, pady=8)
 
     def aboutWindow(self):
         """ opens a new About window """

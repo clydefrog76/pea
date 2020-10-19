@@ -1,5 +1,5 @@
 howtomsg = \
-''' How to use PEA
+'''How to use PEA
 
 Here are the steps required to create a working
 TCP emulator using PEA:
