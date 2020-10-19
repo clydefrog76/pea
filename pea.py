@@ -728,7 +728,7 @@ class Window(Frame):
                     data.append({"Script":bool(scriptbool.get())})
                     data.append([])
 
-                    for idx, count in enumerate(self.entryframes):                  
+                    for idx, _ in enumerate(self.entryframes):                  
                         cmd = str(self.commandlist[idx].get())
                         que = str(self.querylist[idx].get()).encode('latin-1').decode()
                         res = str(self.responselist[idx].get()).encode('latin-1').decode()
@@ -1195,11 +1195,8 @@ def on_closing():
 
     if messagebox.askokcancel("Exit PEA", "Do you want to quit?"):
         root.destroy()
-        #num = os.getpid()
-        #os.system("taskkill /f /pid {}".format(num))
 
 root = Tk()
-#root.geometry("930x720")
 root.resizable(width=False, height=False)
 root.wm_attributes('-topmost', 0)
 root.call("wm", "iconphoto", root._w, PhotoImage(file="assets/icon.png"))    
