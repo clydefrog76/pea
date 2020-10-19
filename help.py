@@ -10,7 +10,7 @@ TCP emulator using PEA:
 4) To add a new command line increase the number of commands
 5) Add a description, query & response. Use this format
 
-    hello\r\n   hello\x0a\x0d   \x35\x75\x0d\x0a
+    hello\\r\\n   hello\\x0a\\x0d   \\x35\\x75\\x0d\\x0a
 
 This methood allows simple protocols to be quickly and easily
 created. If you need more complex responses, such as feedback 
@@ -23,6 +23,4 @@ filename as the JSON file. This will be automatically loaded if the
 checkbox is ticked.
 
 Look at the example for more details on how to deal with 
-received and send strings.
-
-'''
+received and send strings.'''
