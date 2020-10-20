@@ -361,12 +361,7 @@ class Window(Frame):
                 print('Exception occured in customFunc', e)            
 
             if byteresponse and self.mySocket:
-                byteresponsesend = (
-                    byteresponse.encode("latin-1")
-                    .decode("unicode_escape")
-                    .encode("latin-1")
-                )
-
+                byteresponsesend = (byteresponse.encode("latin-1").decode("unicode_escape").encode("latin-1"))
                 self.terminalFunction("OU", byteresponsesend)
                 self.mySocket.write(byteresponsesend)
             else:
