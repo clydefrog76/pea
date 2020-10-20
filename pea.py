@@ -732,7 +732,7 @@ class Window(Frame):
                         res = str(self.responselist[idx].get()).encode('latin-1').decode()
                         data[7].append({"Description":cmd, "Query":que, "Response":res})                
 
-                    outfile.write(json.dumps(data, sort_keys=True, indent=4).encode('latin-1').decode())
+                    outfile.write(json.dumps(data, sort_keys=True, indent=4).encode('latin-1').decode('unicode-escape'))
                     outfile.close()
                     root.wm_attributes('-topmost', 0)
             else:
