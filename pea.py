@@ -1012,7 +1012,7 @@ feel free to donate ANY amount you like, big or small to:"""
         """ gets trigger from Open Port button or the file loader """
 
         if self.portopen == False:
-            if self.commandsList:
+            if self.commandsList and int(self.portentry.get()) >= 1024:
                 self.portbutton.config(text="Close Port")
                 self.portopen = True
                 
@@ -1033,7 +1033,7 @@ feel free to donate ANY amount you like, big or small to:"""
                     print(e)                        
 
             else:
-                msg = "Port not openend, please load a file first!"
+                msg = "Port not openend, please load a file first and check the Port is 1024 or higher!"
                 self.terminalFunction("--", msg)
 
         elif self.portopen == True:
