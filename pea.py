@@ -341,9 +341,8 @@ class Window(Frame):
         """ sends a custom string defined in the code entry field """
 
         if self.sendentry.get() != "Replace this with ASCII or HEX bytes with prefix \\x":
-            sendbyte = ast.literal_eval(f'b"{self.sendentry.get()}"')
-
             if app.mySocket:
+                sendbyte = ast.literal_eval(f'b"{self.sendentry.get()}"')
                 self.terminalFunction("OU", sendbyte)
                 app.mySocket.write(sendbyte)
             else:
