@@ -12,12 +12,10 @@
         https://github.com/clydefrog76/pea
 """
 
+import os, socket, sys, json, time, ast, datetime, binascii, asyncio, platform, shlex
 import tkinter.ttk as ttk
 from tkinter import Tk, filedialog, messagebox, VERTICAL, TRUE, FALSE, Text, Listbox, Canvas, Frame, Menu, PhotoImage, NW, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Y, X, Toplevel, IntVar, StringVar, TclError
 from tkinter.filedialog import askopenfilename
-import os, socket, sys, json, time, ast, datetime, binascii
-import asyncio
-import platform, shlex
 
 async def run_tk(root, interval=0.01):
     '''
@@ -33,7 +31,7 @@ async def run_tk(root, interval=0.01):
 
 class Window(Frame):
     def __init__(self, master=None):
-        """ create the master frame and class """
+        """ create the master frame class """
 
         Frame.__init__(self, master)
         self.master = master
@@ -691,13 +689,13 @@ class Window(Frame):
                             for idx,data in enumerate(data[7]):
                                 if idx == 0:
                                     self.commandlist[0].insert(0, data['Description'])
-                                    self.querylist[0].insert(0, data['Query'].encode('latin-1').decode())
-                                    self.responselist[0].insert(0, data['Response'].encode('latin-1').decode())                          
+                                    self.querylist[0].insert(0, data['Query'].encode('unicode-escape').decode())
+                                    self.responselist[0].insert(0, data['Response'].encode('unicode-escape').decode())                          
                                 else:
                                     appendCommands()
                                     self.commandlist[idx].insert(0, data['Description'])
-                                    self.querylist[idx].insert(0, data['Query'].encode('latin-1').decode())
-                                    self.responselist[idx].insert(0, data['Response'].encode('latin-1').decode())                          
+                                    self.querylist[idx].insert(0, data['Query'].encode('unicode-escape').decode())
+                                    self.responselist[idx].insert(0, data['Response'].encode('unicode-escape').decode())                          
 
                 except Exception as e:
                     print('Error opening sim file:',e)
