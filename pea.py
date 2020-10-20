@@ -18,7 +18,6 @@
 import os, socket, sys, json, time, ast, datetime, binascii, asyncio, platform, shlex
 import tkinter.ttk as ttk
 from tkinter import Tk, filedialog, messagebox, VERTICAL, TRUE, FALSE, Text, Listbox, Canvas, Frame, Menu, PhotoImage, NW, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Y, X, Toplevel, IntVar, StringVar, TclError
-from tkinter.filedialog import askopenfilename
 
 async def run_tk(root, interval=0.01):
     """
@@ -261,7 +260,7 @@ class Window(Frame):
     def browseFunction(self):
         """ pressed on the browse button """
 
-        fname = askopenfilename(
+        fname = filedialog.askopenfilename(
             filetypes=(
                 ("Sim files", "*.json"),
                 ("All files", "*.*"),
