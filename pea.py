@@ -8,6 +8,9 @@
         Alex Teusch - alexander.teusch@gmail.com
         Rupert Powell - rupert@astronoscope.eu
 
+    VerticalScrollFrame by:
+        http://tkinter.unpythonic.net/wiki/VerticalScrolledFrame
+
     Version controlled here:
         https://github.com/clydefrog76/pea
 """
@@ -18,9 +21,9 @@ from tkinter import Tk, filedialog, messagebox, VERTICAL, TRUE, FALSE, Text, Lis
 from tkinter.filedialog import askopenfilename
 
 async def run_tk(root, interval=0.01):
-    '''
+    """
     Run a tkinter app in an asyncio event loop.
-    '''
+    """
     try:
         while True:
             root.update()
@@ -51,7 +54,7 @@ class Window(Frame):
         self.mySocket = None
         self.loop = None      
 
-# menu bar section ----------------------------------------------------
+        # menu bar section ----------------------------------------------------
 
         menubar = Menu(root)
         filemenu = Menu(menubar, tearoff=0)
@@ -231,16 +234,15 @@ class Window(Frame):
 
         self.master.bind("<Alt-c>", self.clearFunction)
 
-    # main functions ---------------------------------------------------
+    # class methods ---------------------------------------------------
 
     def launchScriptEditor(self):
-        '''
+        """
             Opens the script file for editing in the native editor
             on all operating systems
-        '''
+        """
         try:
             fileToEdit = "{}/{}.py".format(self.path, self.scriptName)
-            #print(fileToEdit)
             if os.path.isfile(fileToEdit) :
                 runningOn = platform.system()
                 if runningOn == 'Darwen':
@@ -250,13 +252,14 @@ class Window(Frame):
                 elif runningOn == 'Linux':
                     os.system("xdg-open " + shlex.quote(fileToEdit))
                 else:
-                    print("Unknown OS!")
+                    msg = "Unknown OS!"
+                    self.terminalFunction("ER", msg)
         except:
-            print("No script found")
-            pass
+            msg = "No Script found!"
+            self.terminalFunction("ER", msg)
 
     def browseFunction(self):
-        """ declare the function when pressed on the broswe button """
+        """ pressed on the browse button """
 
         fname = askopenfilename(
             filetypes=(
@@ -312,18 +315,20 @@ class Window(Frame):
                             self.devscript = __import__(scriptName)
                         except Exception as e:
                             msg = "Script import failed: {}.py".format(e)
-                            self.terminalFunction("--", msg)
+                            self.terminalFunction("ER", msg)
                     else:
                         self.devscript = None
         except Exception as e:
             print("Error opening sim file:", e) 
 
     def disconnectFunction(self):
-        """ declare the function when pressed on the disconnect button """
+        """ pressed on the disconnect button """
 
         app.mySocket.close()
 
     def sendentry_click(self, event):
+        """ pressed on the manual send button """
+
         if self.sendentry.get() == "Replace this with ASCII or HEX bytes with prefix \\x":
             event.widget.delete(0, END)
 
@@ -368,7 +373,7 @@ class Window(Frame):
             self.terminalFunction("--", msg)                      
 
     def terminalFunction(self, direction, data):
-        """ function for printing to the terminal window """
+        """ printing to the terminal window """
 
         if self.terminalrunning:
             msgdir = str(direction)
@@ -579,7 +584,7 @@ class Window(Frame):
         self.responselist = list()                      
 
         def spinnerFunction(mode):
-            ''' updates spinner '''
+            """ updates spinner """
 
             if int(spinnerbox.get()) > len(self.entryframes):
                 appendCommands()
@@ -593,7 +598,7 @@ class Window(Frame):
                 self.responselist[0].insert(0, 'Device is connected')                         
 
         def appendCommands():
-            ''' adds new command fields '''
+            """ adds new command fields """
 
             entryframe = Frame(scrollframe.interior)        
             entryframe.pack(fill=BOTH)
@@ -615,7 +620,7 @@ class Window(Frame):
             self.responselist.append(responseentry) 
         
         def removeCommands():
-            ''' removes the last command fields '''
+            """ removes the last command fields """
             
             self.entryframes[-1].destroy()
             del self.entryframes[-1]
@@ -624,7 +629,7 @@ class Window(Frame):
             del self.responselist[-1]
 
         def newFile():
-            ''' clears all fields '''
+            """ clears all fields """
             
             fileentry.delete(0, END)
             manufacturerentry.delete(0, END)
@@ -657,12 +662,12 @@ class Window(Frame):
                 self.responselist = self.responselist[:-1]
 
         def openFile():
-                ''' opens existing file '''
+                """ opens existing file """
 
                 root.wm_attributes('-topmost', 1)
                 fname = filedialog.askopenfilename(filetypes=(("Sim files", "*.json"), ("All files", "*.*") ))
                 
-                ''' Open the simulation json file '''
+                """ Open the simulation json file """
                 try:
                     root.wm_attributes('-topmost', 0)
                     with open(fname) as data_file:    
@@ -702,7 +707,7 @@ class Window(Frame):
                     root.wm_attributes('-topmost', 0)                 
 
         def saveFile():
-            ''' saves current file '''
+            """ saves current file """
 
             if manufacturerentry.get() and modelentry.get() and categoryentry.get() and jsonportentry.get() and self.commandlist[0].get()\
                 and self.querylist[0].get() and self.responselist[0].get():
@@ -922,10 +927,10 @@ class Window(Frame):
         asciilabel.image = asciiimage   
 
     def howtoWindow(self):
-        """ opens a new About window """
+        """ opens a new HowTo window """
          
         def on_howtoclosing():
-            """ kills the About window """
+            """ kills the HowTo window """
 
             howtoWindow.destroy()
 
@@ -964,12 +969,12 @@ class Window(Frame):
         pealogo = PhotoImage(file='assets/logo.gif')
         aboutCanvas.pealogo = pealogo
         aboutCanvas.create_image((10, 10), anchor='nw', image=pealogo)
-        aboutmsg = '''PEA: a python written tcp ethernet device emulator  \n
+        aboutmsg = """PEA: a python written tcp ethernet device emulator  \n
 Version: 1.0.0
 Python Version: 3.8.5\n
 Github Repo: https://github.com/clydefrog76/pea\n
 Programmers: Alexander Teusch
-             Rupert Powell'''
+             Rupert Powell"""
         aboutCanvas.create_text(10, 150, anchor='nw', font=("Consolas", 10), text=aboutmsg)  
 
     def donationsWindow(self):
@@ -989,11 +994,11 @@ Programmers: Alexander Teusch
 
         donationsCanvas = Canvas(donationsWindow, width=0, height=0)
         donationsCanvas.pack(expand=YES, fill=BOTH)
-        donationsmsg = '''Although PEA is free, fully open-source and built with the community
+        donationsmsg = """Although PEA is free, fully open-source and built with the community
 in mind, we the developers still have spend dozends of hours in\ncreating and testing this tool.\n
 If you like this great tool and you wish to support us and contribute
 to future improvents, updates or even just some beer money, please
-feel free to donate ANY amount you like, big or small to:'''
+feel free to donate ANY amount you like, big or small to:"""
         donationsCanvas.create_text(15, 15, anchor='nw', font=("Consolas", 10), text=donationsmsg)     
         donationsCanvas.create_text(15, 150, anchor='nw', font=("Consolas", 10), text='PayPal:', fill='blue')
         donationsCanvas.create_text(85, 150, anchor='nw', font=("Consolas", 10), text='alexander.teusch@runbox.com')
@@ -1150,6 +1155,12 @@ def connection_close():
     app.disconnectbutton.config(state="disabled")
 
 class VerticalScrolledFrame(Frame):
+    """A pure Tkinter scrollable frame that actually works!
+    * Use the 'interior' attribute to place widgets inside the scrollable frame
+    * Construct and pack/place/grid normally
+    * This frame only allows vertical scrolling
+    """
+
     def __init__(self, parent, *args, **kw):
         Frame.__init__(self, parent, *args, **kw)            
 
