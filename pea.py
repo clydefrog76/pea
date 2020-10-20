@@ -691,15 +691,19 @@ class Window(Frame):
                             spinnerbox.set(str(len(data[7])))
 
                             for idx,data in enumerate(data[7]):
+                                cmd = data['Description']
+                                que = data['Query'].encode('unicode-escape').decode()
+                                res = data['Response'].encode('unicode-escape').decode()
+                                
                                 if idx == 0:
-                                    self.commandlist[0].insert(0, data['Description'])
-                                    self.querylist[0].insert(0, data['Query'].encode('unicode-escape').decode())
-                                    self.responselist[0].insert(0, data['Response'].encode('unicode-escape').decode())                          
+                                    self.commandlist[0].insert(0, cmd)
+                                    self.querylist[0].insert(0, que)
+                                    self.responselist[0].insert(0, res)                          
                                 else:
                                     appendCommands()
-                                    self.commandlist[idx].insert(0, data['Description'])
-                                    self.querylist[idx].insert(0, data['Query'].encode('unicode-escape').decode())
-                                    self.responselist[idx].insert(0, data['Response'].encode('unicode-escape').decode())                          
+                                    self.commandlist[idx].insert(0, cmd)
+                                    self.querylist[idx].insert(0, que)
+                                    self.responselist[idx].insert(0, res)                          
 
                 except Exception as e:
                     print('Error opening sim file:',e)
