@@ -1,10 +1,10 @@
 import re
   
-print('WIFI LED Script Imported')
+print('Template Script Imported')
 
 # dev stores all the attributes of the device
 dev = {
-    'Name' : 'WIFI LED'
+    'Name' : 'Example Template'
     }
 
 def rxscript(conn, rx):

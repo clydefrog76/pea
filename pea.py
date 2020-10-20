@@ -50,6 +50,7 @@ class Window(Frame):
         self.devscript = None
         
         self.port = {"listen": 0, "connected": 0}
+        self.portopen = False
         self.mySocket = None
         self.loop = None      
 
@@ -260,65 +261,70 @@ class Window(Frame):
     def browseFunction(self):
         """ pressed on the browse button """
 
-        fname = filedialog.askopenfilename(
-            filetypes=(
-                ("Sim files", "*.json"),
-                ("All files", "*.*"),
+        if self.portopen:
+            msg = "Please close the open port first"
+            self.terminalFunction("--", msg)
+        
+        else:
+            fname = filedialog.askopenfilename(
+                filetypes=(
+                    ("Sim files", "*.json"),
+                    ("All files", "*.*"),
+                )
             )
-        )
 
-        path = os.path.dirname(os.path.abspath(fname))
-        scriptName = os.path.basename(fname)[:-5]
-        self.scriptName = scriptName
-        self.path = path
+            path = os.path.dirname(os.path.abspath(fname))
+            scriptName = os.path.basename(fname)[:-5]
+            self.scriptName = scriptName
+            self.path = path
 
-        if fname:
-            try:
-                msg = "Loading {}".format(fname)
-                self.terminalFunction("--", msg)
-            except:
-                print("Failed to read file\n'%s'" % fname)
-
-        """ Open the simulation json file """
-        try:
-            with open(fname) as data_file:
-                data = json.load(data_file)
-
-                loadedManufacturer = ""
-                loadedModel = ""
-                loadedPort = 0
-                loadedDelay = ""
-
-                if data:
-                    self.commandsList = data
-
-                    loadedManufacturer = data[0]["Manufacturer"]
-                    loadedModel = data[1]["Model"]
-                    loadedPort = data[4]["Port"]
-                    loadedDelay = data[5]["Delay"]
-
-                    self.portentry.delete(0, END)
-                    self.portentry.insert(0, loadedPort)
-                    self.filelabel.config(text="{} - {}".format(loadedManufacturer, loadedModel))
-
-                    msg = "{} - {} loaded with a Response Delay of {}s".format(
-                        loadedManufacturer, loadedModel, loadedDelay
-                    )
+            if fname:
+                try:
+                    msg = "Loading {}".format(fname)
                     self.terminalFunction("--", msg)
+                except:
+                    print("Failed to read file\n'%s'" % fname)
 
-                    if data[6]["Script"]:  # If a script is specified then also open that
-                        msg = "Importing Script file: {}.py".format(scriptName)
+            """ Open the simulation json file """
+            try:
+                with open(fname) as data_file:
+                    data = json.load(data_file)
+
+                    loadedManufacturer = ""
+                    loadedModel = ""
+                    loadedPort = 0
+                    loadedDelay = ""
+
+                    if data:
+                        self.commandsList = data
+
+                        loadedManufacturer = data[0]["Manufacturer"]
+                        loadedModel = data[1]["Model"]
+                        loadedPort = data[4]["Port"]
+                        loadedDelay = data[5]["Delay"]
+
+                        self.portentry.delete(0, END)
+                        self.portentry.insert(0, loadedPort)
+                        self.filelabel.config(text="{} - {}".format(loadedManufacturer, loadedModel))
+
+                        msg = "{} - {} loaded with a Response Delay of {}s".format(
+                            loadedManufacturer, loadedModel, loadedDelay
+                        )
                         self.terminalFunction("--", msg)
-                        sys.path.append("{}".format(path))
-                        try:
-                            self.devscript = __import__(scriptName)
-                        except Exception as e:
-                            msg = "Script import failed: {}.py".format(e)
-                            self.terminalFunction("ER", msg)
-                    else:
-                        self.devscript = None
-        except Exception as e:
-            print("Error opening sim file:", e) 
+
+                        if data[6]["Script"]:  # If a script is specified then also open that
+                            msg = "Importing Script file: {}.py".format(scriptName)
+                            self.terminalFunction("--", msg)
+                            sys.path.append("{}".format(path))
+                            try:
+                                self.devscript = __import__(scriptName)
+                            except Exception as e:
+                                msg = "Script import failed: {}.py".format(e)
+                                self.terminalFunction("ER", msg)
+                        else:
+                            self.devscript = None
+            except Exception as e:
+                print("Error opening sim file:", e) 
 
     def disconnectFunction(self):
         """ pressed on the disconnect button """
@@ -1011,9 +1017,10 @@ feel free to donate ANY amount you like, big or small to:"""
     async def listenFunction(self):
         """ gets trigger from Open Port button or the file loader """
 
-        if str(self.portbutton["text"]) == "Open Port":
+        if self.portopen == False:
             if self.commandsList:
                 self.portbutton.config(text="Close Port")
+                self.portopen = True
                 
                 newport = int(self.portentry.get())
                 self.port["listen"] = newport
@@ -1035,13 +1042,14 @@ feel free to donate ANY amount you like, big or small to:"""
                 msg = "Port not openend, please load a file first!"
                 self.terminalFunction("--", msg)
 
-        elif str(self.portbutton["text"]) == "Close Port":
+        elif self.portopen == True:
             msg = "Port is closed"
             self.terminalFunction("--", msg)            
 
             self.portentry.config(state="normal")
             self.portbutton.config(text="Open Port")
-            self.port["listen"] = 0      
+            self.port["listen"] = 0
+            self.portopen = False      
 
             connection_close()
             self.sock.close()
