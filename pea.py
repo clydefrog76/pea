@@ -18,6 +18,7 @@
 import os, socket, sys, json, time, ast, datetime, binascii, asyncio, platform, shlex
 import tkinter.ttk as ttk
 from tkinter import Tk, filedialog, messagebox, VERTICAL, TRUE, FALSE, Text, Listbox, Canvas, Frame, Menu, PhotoImage, NW, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Y, X, Toplevel, IntVar, StringVar, TclError
+import importlib
 
 async def run_tk(root, interval=0.01):
     """
@@ -258,6 +259,11 @@ class Window(Frame):
         except:
             msg = "No Script found!"
             self.terminalFunction("ER", msg)
+
+    def reloadScript(self):
+        """ function to reload a script when changed """
+
+        importlib.reload(self.devscript)
 
     def browseFunction(self):
         """ pressed on the browse button """
