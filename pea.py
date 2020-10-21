@@ -66,6 +66,7 @@ class Window(Frame):
         editmenu.add_command(label="Emulator JSON Editor", command=self.jsoneditorWindow)
         editmenu.add_separator()
         editmenu.add_command(label="Emulator Script Editor", command=self.launchScriptEditor)
+        editmenu.add_command(label="Reload Script", command=self.reloadScript)
         menubar.add_cascade(label="Edit", menu=editmenu)        
 
         toolsmenu = Menu(menubar, tearoff=0)
