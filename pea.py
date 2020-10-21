@@ -15,10 +15,9 @@
         https://github.com/clydefrog76/pea
 """
 
-import os, socket, sys, json, time, ast, datetime, binascii, asyncio, platform, shlex
+import os, socket, sys, json, time, ast, datetime, binascii, asyncio, platform, shlex, importlib
 import tkinter.ttk as ttk
 from tkinter import Tk, filedialog, messagebox, VERTICAL, TRUE, FALSE, Text, Listbox, Canvas, Frame, Menu, PhotoImage, NW, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Y, X, Toplevel, IntVar, StringVar, TclError
-import importlib
 
 async def run_tk(root, interval=0.01):
     """
