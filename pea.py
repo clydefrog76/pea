@@ -697,13 +697,13 @@ class Window(Frame):
                                 
                                 if idx == 0:
                                     self.commandlist[0].insert(0, cmd)
-                                    self.querylist[0].insert(0, que)
-                                    self.responselist[0].insert(0, res)                          
+                                    self.querylist[0].insert(0, que.replace(r'\\x', r'\x'))
+                                    self.responselist[0].insert(0, res.replace(r'\\x', r'\x'))                          
                                 else:
                                     appendCommands()
                                     self.commandlist[idx].insert(0, cmd)
-                                    self.querylist[idx].insert(0, que)
-                                    self.responselist[idx].insert(0, res)                          
+                                    self.querylist[idx].insert(0, que.replace(r'\\x', r'\x'))
+                                    self.responselist[idx].insert(0, res.replace(r'\\x', r'\x'))                          
 
                 except Exception as e:
                     print('Error opening sim file:',e)
@@ -738,7 +738,7 @@ class Window(Frame):
                         cmd = str(self.commandlist[idx].get())
                         que = str(self.querylist[idx].get()).encode('latin-1').decode()
                         res = str(self.responselist[idx].get()).encode('latin-1').decode()
-                        data[7].append({"Description":cmd, "Query":que, "Response":res})                
+                        data[7].append({"Description":cmd, "Query":que.replace(r'\x', r'\\x'), "Response":res.replace(r'\x', r'\\x')})                
 
                     outfile.write(json.dumps(data, sort_keys=True, indent=4).encode('latin-1').decode('unicode-escape'))
                     outfile.close()
