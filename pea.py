@@ -264,6 +264,8 @@ class Window(Frame):
         """ function to reload a script when changed """
 
         importlib.reload(self.devscript)
+        msg = "Script has been reloaded"
+        self.terminalFunction("--", msg)
 
     def browseFunction(self):
         """ pressed on the browse button """
