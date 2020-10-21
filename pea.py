@@ -8,21 +8,21 @@
         Alex Teusch - alexander.teusch@gmail.com
         Rupert Powell - rupert@astronoscope.eu
 
+    VerticalScrollFrame by:
+        http://tkinter.unpythonic.net/wiki/VerticalScrolledFrame
+
     Version controlled here:
         https://github.com/clydefrog76/pea
 """
 
+import os, socket, sys, json, time, ast, datetime, binascii, asyncio, platform, shlex
 import tkinter.ttk as ttk
 from tkinter import Tk, filedialog, messagebox, VERTICAL, TRUE, FALSE, Text, Listbox, Canvas, Frame, Menu, PhotoImage, NW, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Y, X, Toplevel, IntVar, StringVar, TclError
-from tkinter.filedialog import askopenfilename
-import os, socket, sys, json, time, ast, datetime, binascii
-import asyncio
-import platform, shlex
 
 async def run_tk(root, interval=0.01):
-    '''
+    """
     Run a tkinter app in an asyncio event loop.
-    '''
+    """
     try:
         while True:
             root.update()
@@ -33,7 +33,7 @@ async def run_tk(root, interval=0.01):
 
 class Window(Frame):
     def __init__(self, master=None):
-        """ create the master frame and class """
+        """ create the master frame class """
 
         Frame.__init__(self, master)
         self.master = master
@@ -50,10 +50,11 @@ class Window(Frame):
         self.devscript = None
         
         self.port = {"listen": 0, "connected": 0}
+        self.portopen = False
         self.mySocket = None
         self.loop = None      
 
-# menu bar section ----------------------------------------------------
+        # menu bar section ----------------------------------------------------
 
         menubar = Menu(root)
         filemenu = Menu(menubar, tearoff=0)
@@ -234,15 +235,15 @@ class Window(Frame):
 
         self.master.bind("<Alt-c>", self.clearFunction)
 
-    # main functions ---------------------------------------------------
+    # class methods ---------------------------------------------------
 
     def launchScriptEditor(self):
-        '''
+        """
             Opens the script file for editing in the native editor
             on all operating systems
-        '''
+        """
         try:
-            fileToEdit = "{}\{}.py".format(self.path, self.scriptName)
+            fileToEdit = "{}/{}.py".format(self.path, self.scriptName)
             if os.path.isfile(fileToEdit) :
                 runningOn = platform.system()
                 if runningOn == 'Darwen':
@@ -250,79 +251,90 @@ class Window(Frame):
                 elif runningOn == 'Windows':
                     os.system("start " + fileToEdit)
                 elif runningOn == 'Linux':
-                    os.system("open " + shlex.quote(fileToEdit))
+                    os.system("xdg-open " + shlex.quote(fileToEdit))
+                else:
+                    msg = "Unknown OS!"
+                    self.terminalFunction("ER", msg)
         except:
-            pass
+            msg = "No Script found!"
+            self.terminalFunction("ER", msg)
 
     def browseFunction(self):
-        """ declare the function when pressed on the broswe button """
+        """ pressed on the browse button """
 
-        fname = askopenfilename(
-            filetypes=(
-                ("Sim files", "*.JSON"),
-                ("All files", "*.*"),
+        if self.portopen:
+            msg = "Please close the open port first"
+            self.terminalFunction("--", msg)
+        
+        else:
+            fname = filedialog.askopenfilename(
+                filetypes=(
+                    ("Sim files", "*.json"),
+                    ("All files", "*.*"),
+                )
             )
-        )
 
-        path = os.path.dirname(os.path.abspath(fname))
-        scriptName = os.path.basename(fname)[:-5]
-        self.scriptName = scriptName
-        self.path = path
+            path = os.path.dirname(os.path.abspath(fname))
+            scriptName = os.path.basename(fname)[:-5]
+            self.scriptName = scriptName
+            self.path = path
 
-        if fname:
-            try:
-                msg = "Loading {}".format(fname)
-                self.terminalFunction("--", msg)
-            except:
-                print("Failed to read file\n'%s'" % fname)
-
-        """ Open the simulation json file """
-        try:
-            with open(fname) as data_file:
-                data = json.load(data_file)
-
-                loadedManufacturer = ""
-                loadedModel = ""
-                loadedPort = 0
-                loadedDelay = ""
-
-                if data:
-                    self.commandsList = data
-
-                    loadedManufacturer = data[0]["Manufacturer"]
-                    loadedModel = data[1]["Model"]
-                    loadedPort = data[4]["Port"]
-                    loadedDelay = data[5]["Delay"]
-
-                    self.portentry.delete(0, END)
-                    self.portentry.insert(0, loadedPort)
-                    self.filelabel.config(text="{} - {}".format(loadedManufacturer, loadedModel))
-
-                    msg = "{} - {} loaded with a Response Delay of {}s".format(
-                        loadedManufacturer, loadedModel, loadedDelay
-                    )
+            if fname:
+                try:
+                    msg = "Loading {}".format(fname)
                     self.terminalFunction("--", msg)
+                except:
+                    print("Failed to read file\n'%s'" % fname)
 
-                    if data[6]["Script"]:  # If a script is specified then also open that
-                        msg = "Importing Script file: {}.py".format(scriptName)
+            """ Open the simulation json file """
+            try:
+                with open(fname) as data_file:
+                    data = json.load(data_file)
+
+                    loadedManufacturer = ""
+                    loadedModel = ""
+                    loadedPort = 0
+                    loadedDelay = ""
+
+                    if data:
+                        self.commandsList = data
+
+                        loadedManufacturer = data[0]["Manufacturer"]
+                        loadedModel = data[1]["Model"]
+                        loadedPort = data[4]["Port"]
+                        loadedDelay = data[5]["Delay"]
+
+                        self.portentry.delete(0, END)
+                        self.portentry.insert(0, loadedPort)
+                        self.filelabel.config(text="{} - {}".format(loadedManufacturer, loadedModel))
+
+                        msg = "{} - {} loaded with a Response Delay of {}s".format(
+                            loadedManufacturer, loadedModel, loadedDelay
+                        )
                         self.terminalFunction("--", msg)
-                        sys.path.append("{}".format(path))
-                        try:
-                            self.devscript = __import__(scriptName)
-                        except Exception as e:
-                            msg = "Script import failed: {}.py".format(e)
+
+                        if data[6]["Script"]:  # If a script is specified then also open that
+                            msg = "Importing Script file: {}.py".format(scriptName)
                             self.terminalFunction("--", msg)
-                    else:
-                        self.devscript = None
-        except Exception as e:
-            print("Error opening sim file:", e) 
+                            sys.path.append("{}".format(path))
+                            try:
+                                self.devscript = __import__(scriptName)
+                            except Exception as e:
+                                msg = "Script import failed: {}.py".format(e)
+                                self.terminalFunction("ER", msg)
+                        else:
+                            self.devscript = None
+            except Exception as e:
+                print("Error opening sim file:", e) 
 
     def disconnectFunction(self):
-        """ declare the function when pressed on the disconnect button """
+        """ pressed on the disconnect button """
 
         app.mySocket.close()
 
     def sendentry_click(self, event):
+        """ pressed on the manual send button """
+
         if self.sendentry.get() == "Replace this with ASCII or HEX bytes with prefix \\x":
             event.widget.delete(0, END)
 
@@ -330,9 +342,8 @@ class Window(Frame):
         """ sends a custom string defined in the code entry field """
 
         if self.sendentry.get() != "Replace this with ASCII or HEX bytes with prefix \\x":
-            sendbyte = ast.literal_eval(f'b"{self.sendentry.get()}"')
-
             if app.mySocket:
+                sendbyte = ast.literal_eval(f'b"{self.sendentry.get()}"')
                 self.terminalFunction("OU", sendbyte)
                 app.mySocket.write(sendbyte)
             else:
@@ -351,12 +362,7 @@ class Window(Frame):
                 print('Exception occured in customFunc', e)            
 
             if byteresponse and self.mySocket:
-                byteresponsesend = (
-                    byteresponse.encode("latin-1")
-                    .decode("unicode_escape")
-                    .encode("latin-1")
-                )
-
+                byteresponsesend = (byteresponse.encode("latin-1").decode("unicode_escape").encode("latin-1"))
                 self.terminalFunction("OU", byteresponsesend)
                 self.mySocket.write(byteresponsesend)
             else:
@@ -367,7 +373,7 @@ class Window(Frame):
             self.terminalFunction("--", msg)                      
 
     def terminalFunction(self, direction, data):
-        """ function for printing to the terminal window """
+        """ printing to the terminal window """
 
         if self.terminalrunning:
             msgdir = str(direction)
@@ -578,7 +584,7 @@ class Window(Frame):
         self.responselist = list()                      
 
         def spinnerFunction(mode):
-            ''' updates spinner '''
+            """ updates spinner """
 
             if int(spinnerbox.get()) > len(self.entryframes):
                 appendCommands()
@@ -592,7 +598,7 @@ class Window(Frame):
                 self.responselist[0].insert(0, 'Device is connected')                         
 
         def appendCommands():
-            ''' adds new command fields '''
+            """ adds new command fields """
 
             entryframe = Frame(scrollframe.interior)        
             entryframe.pack(fill=BOTH)
@@ -614,7 +620,7 @@ class Window(Frame):
             self.responselist.append(responseentry) 
         
         def removeCommands():
-            ''' removes the last command fields '''
+            """ removes the last command fields """
             
             self.entryframes[-1].destroy()
             del self.entryframes[-1]
@@ -623,7 +629,7 @@ class Window(Frame):
             del self.responselist[-1]
 
         def newFile():
-            ''' clears all fields '''
+            """ clears all fields """
             
             fileentry.delete(0, END)
             manufacturerentry.delete(0, END)
@@ -656,12 +662,12 @@ class Window(Frame):
                 self.responselist = self.responselist[:-1]
 
         def openFile():
-                ''' opens existing file '''
+                """ opens existing file """
 
                 root.wm_attributes('-topmost', 1)
-                fname = filedialog.askopenfilename(filetypes=(("Sim files", "*.JSON"), ("All files", "*.*") ))
+                fname = filedialog.askopenfilename(filetypes=(("Sim files", "*.json"), ("All files", "*.*") ))
                 
-                ''' Open the simulation json file '''
+                """ Open the simulation json file """
                 try:
                     root.wm_attributes('-topmost', 0)
                     with open(fname) as data_file:    
@@ -686,22 +692,26 @@ class Window(Frame):
                             spinnerbox.set(str(len(data[7])))
 
                             for idx,data in enumerate(data[7]):
+                                cmd = data['Description']
+                                que = data['Query'].encode('unicode-escape').decode()
+                                res = data['Response'].encode('unicode-escape').decode()
+                                
                                 if idx == 0:
-                                    self.commandlist[0].insert(0, data['Description'])
-                                    self.querylist[0].insert(0, data['Query'].encode('latin-1').decode())
-                                    self.responselist[0].insert(0, data['Response'].encode('latin-1').decode())                          
+                                    self.commandlist[0].insert(0, cmd)
+                                    self.querylist[0].insert(0, que.replace(r'\\x', r'\x'))
+                                    self.responselist[0].insert(0, res.replace(r'\\x', r'\x'))                          
                                 else:
                                     appendCommands()
-                                    self.commandlist[idx].insert(0, data['Description'])
-                                    self.querylist[idx].insert(0, data['Query'].encode('latin-1').decode())
-                                    self.responselist[idx].insert(0, data['Response'].encode('latin-1').decode())                          
+                                    self.commandlist[idx].insert(0, cmd)
+                                    self.querylist[idx].insert(0, que.replace(r'\\x', r'\x'))
+                                    self.responselist[idx].insert(0, res.replace(r'\\x', r'\x'))                          
 
                 except Exception as e:
                     print('Error opening sim file:',e)
                     root.wm_attributes('-topmost', 0)                 
 
         def saveFile():
-            ''' saves current file '''
+            """ saves current file """
 
             if manufacturerentry.get() and modelentry.get() and categoryentry.get() and jsonportentry.get() and self.commandlist[0].get()\
                 and self.querylist[0].get() and self.responselist[0].get():
@@ -725,13 +735,13 @@ class Window(Frame):
                     data.append({"Script":bool(scriptbool.get())})
                     data.append([])
 
-                    for idx, count in enumerate(self.entryframes):                  
+                    for idx, _ in enumerate(self.entryframes):                  
                         cmd = str(self.commandlist[idx].get())
                         que = str(self.querylist[idx].get()).encode('latin-1').decode()
                         res = str(self.responselist[idx].get()).encode('latin-1').decode()
-                        data[7].append({"Description":cmd, "Query":que, "Response":res})                
+                        data[7].append({"Description":cmd, "Query":que.replace(r'\x', r'\\x'), "Response":res.replace(r'\x', r'\\x')})                
 
-                    outfile.write(json.dumps(data, sort_keys=True, indent=4).encode('latin-1').decode())
+                    outfile.write(json.dumps(data, sort_keys=True, indent=4).encode('latin-1').decode('unicode-escape'))
                     outfile.close()
                     root.wm_attributes('-topmost', 0)
             else:
@@ -865,7 +875,7 @@ class Window(Frame):
                     asciioutput.insert(0, 'Character Error')
 
         asciihexWindow = Toplevel()
-        asciihexWindow.geometry("390x138+{}+{}".format(root.winfo_rootx()+262, root.winfo_rooty()+245))
+        asciihexWindow.geometry("+{}+{}".format(root.winfo_rootx()+262, root.winfo_rooty()+245))
         asciihexWindow.wm_title("ASCII - HEX Converter")
         asciihexWindow.resizable(width=False, height=False)
         asciihexWindow.pack_propagate(True)
@@ -921,10 +931,10 @@ class Window(Frame):
         asciilabel.image = asciiimage   
 
     def howtoWindow(self):
-        """ opens a new About window """
+        """ opens a new HowTo window """
          
         def on_howtoclosing():
-            """ kills the About window """
+            """ kills the HowTo window """
 
             howtoWindow.destroy()
 
@@ -934,6 +944,14 @@ class Window(Frame):
         howtoWindow.resizable(width=False, height=False)
         howtoWindow.pack_propagate(True)
         howtoWindow.protocol("WM_DELETE_WINDOW", on_howtoclosing) 
+        
+        howtoFrame = VerticalScrolledFrame(howtoWindow) 
+        howtoFrame.pack(expand=1, fill=BOTH)
+        
+        from help import howtomsg
+        howtoText = ttk.Label(howtoFrame.interior, text=howtomsg)
+        howtoText.config(font=("consolas", 10))             
+        howtoText.pack(padx=8, pady=8)
 
     def aboutWindow(self):
         """ opens a new About window """
@@ -955,12 +973,12 @@ class Window(Frame):
         pealogo = PhotoImage(file='assets/logo.gif')
         aboutCanvas.pealogo = pealogo
         aboutCanvas.create_image((10, 10), anchor='nw', image=pealogo)
-        aboutmsg = '''PEA: a python written tcp ethernet device emulator\n
+        aboutmsg = """PEA: a python written tcp ethernet device emulator  \n
 Version: 1.0.0
 Python Version: 3.8.5\n
 Github Repo: https://github.com/clydefrog76/pea\n
 Programmers: Alexander Teusch
-             Rupert Powell'''
+             Rupert Powell"""
         aboutCanvas.create_text(10, 150, anchor='nw', font=("Consolas", 10), text=aboutmsg)  
 
     def donationsWindow(self):
@@ -980,11 +998,11 @@ Programmers: Alexander Teusch
 
         donationsCanvas = Canvas(donationsWindow, width=0, height=0)
         donationsCanvas.pack(expand=YES, fill=BOTH)
-        donationsmsg = '''Although PEA is free, fully open-source and built with the community
+        donationsmsg = """Although PEA is free, fully open-source and built with the community
 in mind, we the developers still have spend dozends of hours in\ncreating and testing this tool.\n
 If you like this great tool and you wish to support us and contribute
 to future improvents, updates or even just some beer money, please
-feel free to donate ANY amount you like, big or small to:'''
+feel free to donate ANY amount you like, big or small to:"""
         donationsCanvas.create_text(15, 15, anchor='nw', font=("Consolas", 10), text=donationsmsg)     
         donationsCanvas.create_text(15, 150, anchor='nw', font=("Consolas", 10), text='PayPal:', fill='blue')
         donationsCanvas.create_text(85, 150, anchor='nw', font=("Consolas", 10), text='alexander.teusch@runbox.com')
@@ -998,9 +1016,10 @@ feel free to donate ANY amount you like, big or small to:'''
     async def listenFunction(self):
         """ gets trigger from Open Port button or the file loader """
 
-        if str(self.portbutton["text"]) == "Open Port":
-            if self.commandsList:
+        if self.portopen == False:
+            if self.commandsList and int(self.portentry.get()) >= 1024:
                 self.portbutton.config(text="Close Port")
+                self.portopen = True
                 
                 newport = int(self.portentry.get())
                 self.port["listen"] = newport
@@ -1019,16 +1038,17 @@ feel free to donate ANY amount you like, big or small to:'''
                     print(e)                        
 
             else:
-                msg = "Port not openend, please load a file first!"
+                msg = "Port not openend, please load a file first and check the Port is 1024 or higher!"
                 self.terminalFunction("--", msg)
 
-        elif str(self.portbutton["text"]) == "Close Port":
+        elif self.portopen == True:
             msg = "Port is closed"
             self.terminalFunction("--", msg)            
 
             self.portentry.config(state="normal")
             self.portbutton.config(text="Open Port")
-            self.port["listen"] = 0      
+            self.port["listen"] = 0
+            self.portopen = False      
 
             connection_close()
             self.sock.close()
@@ -1141,6 +1161,12 @@ def connection_close():
     app.disconnectbutton.config(state="disabled")
 
 class VerticalScrolledFrame(Frame):
+    """A pure Tkinter scrollable frame that actually works!
+    * Use the 'interior' attribute to place widgets inside the scrollable frame
+    * Construct and pack/place/grid normally
+    * This frame only allows vertical scrolling
+    """
+
     def __init__(self, parent, *args, **kw):
         Frame.__init__(self, parent, *args, **kw)            
 
@@ -1184,17 +1210,17 @@ def on_closing():
 
     if messagebox.askokcancel("Exit PEA", "Do you want to quit?"):
         root.destroy()
-        #num = os.getpid()
-        #os.system("taskkill /f /pid {}".format(num))
 
 root = Tk()
-root.geometry("930x720")
 root.resizable(width=False, height=False)
 root.wm_attributes('-topmost', 0)
 root.call("wm", "iconphoto", root._w, PhotoImage(file="assets/icon.png"))    
 app = Window(root)
 
 mystyle = ttk.Style()
-mystyle.theme_use("vista")  # classic,default,clam,winnative,vista,xpnative,alt
+if sys.platform.startswith('win'):
+    mystyle.theme_use("vista")  # classic,default,clam,winnative,vista,xpnative,alt
+else:
+    mystyle.theme_use("default")
 
 asyncio.run(main())
