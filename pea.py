@@ -52,7 +52,8 @@ class Window(Frame):
         self.port = {"listen": 0, "connected": 0}
         self.portopen = False
         self.mySocket = None
-        self.loop = None      
+        self.loop = None   
+        self.LogModeActive = IntVar()
 
         # menu bar section ----------------------------------------------------
 
@@ -202,6 +203,13 @@ class Window(Frame):
             command=lambda: self.clearFunction()
         )
         clearbutton.pack(padx=5, pady=5, side=LEFT) 
+
+        logmodecheckbox = ttk.Checkbutton(
+            terminalfuncframe, 
+            text="Log Mode",
+            variable=self.LogModeActive)
+
+        logmodecheckbox.pack(padx=5, pady=5, side=LEFT)
 
         spacerlabel = ttk.Label(terminalfuncframe, text="")
         spacerlabel.pack(padx=223, pady=5, side=LEFT)        
@@ -1145,9 +1153,10 @@ class SocketServer(asyncio.Protocol):
                             print('Exception occured in sending', e)
 
                 else:  # Nothing found in query
-                    byteresponse = "Error - no match found with query"
-                    app.terminalFunction("ER", byteresponse)
-                    app.mySocket.write(bytes(byteresponse, "utf-8"))
+                    if app.LogModeActive.get() == 0:
+                        byteresponse = "Error - no match found with query"
+                        app.terminalFunction("ER", byteresponse)
+                        app.mySocket.write(bytes(byteresponse, "utf-8"))
         else:
             app.terminalFunction(
                 "--", "Error - no device emulator file has been loaded"
