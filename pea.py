@@ -313,7 +313,9 @@ class Window(Frame):
             self.func4Text.set(self.devscript.funcName[3])
             self.func5Text.set(self.devscript.funcName[4])
         except:
-            pass
+            msg = "Script import: Problem with Custom Function names 'funcName'"
+            self.terminalFunction("ER", msg)
+            
         msg = "Script has been reloaded"
         self.terminalFunction("--", msg)
 
@@ -389,7 +391,8 @@ class Window(Frame):
                                 self.func4Text.set(self.devscript.funcName[3])
                                 self.func5Text.set(self.devscript.funcName[4])
                             except:
-                                pass
+                                msg = "Script import: Problem with Custom Function names 'funcName'"
+                                self.terminalFunction("ER", msg)
                         else:
                             self.devscript = None
                             self.func1Text.set("Func 1")
