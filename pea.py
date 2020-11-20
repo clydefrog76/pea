@@ -32,7 +32,7 @@
 
 import os, sys, json, time, ast, datetime, binascii, asyncio, platform, shlex, importlib
 import tkinter.ttk as ttk
-from tkinter import Tk, filedialog, messagebox, VERTICAL, TRUE, FALSE, Text, Listbox, Canvas, Frame, Menu, PhotoImage, NW, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Y, X, Toplevel, IntVar, StringVar, TclError
+from tkinter import Tk, filedialog, messagebox, VERTICAL, TRUE, FALSE, Text, Listbox, Canvas, Frame, Menu, PhotoImage, NW, YES, NO, BOTH, LEFT, RIGHT, END, TOP, BOTTOM, Y, X, Toplevel, IntVar, StringVar, TclError, StringVar
 
 async def run_tk(root, interval=0.01):
     """
@@ -162,28 +162,43 @@ class Window(Frame):
 
         scriptframe = ttk.LabelFrame(mainframe2, text="Script Function Buttons",)
         scriptframe.grid(row=0, column=1, padx=8, pady=8, sticky='nsew')
+
+        self.func1Text = StringVar()
+        self.func1Text.set("Func 1")
         self.scriptbutton1 = ttk.Button(scriptframe,
-            text="Func 1", width=11,
+            textvariable=self.func1Text, width=11,
             command=lambda i=1: self.callCustomFunc(i),
         )
         self.scriptbutton1.pack(padx=5, pady=5, side=LEFT)
+
+        self.func2Text = StringVar()
+        self.func2Text.set("Func 2")
         self.scriptbutton2 = ttk.Button(scriptframe,
-            text="Func 2", width=11,
+            textvariable=self.func2Text, width=11,
             command=lambda i=2: self.callCustomFunc(i),
         )
         self.scriptbutton2.pack(padx=5, pady=5, side=LEFT)
+
+        self.func3Text = StringVar()
+        self.func3Text.set("Func 3")
         self.scriptbutton3 = ttk.Button(scriptframe,
-            text="Func 3", width=11,
+            textvariable=self.func3Text, width=11,
             command=lambda i=3: self.callCustomFunc(i),
         )
         self.scriptbutton3.pack(padx=5, pady=5, side=LEFT)
+
+        self.func4Text = StringVar()
+        self.func4Text.set("Func 4")
         self.scriptbutton4 = ttk.Button(scriptframe,
-            text="Func4", width=11,
+            textvariable=self.func4Text, width=11,
             command=lambda i=4: self.callCustomFunc(i),
         )
         self.scriptbutton4.pack(padx=5, pady=5, side=LEFT)
+
+        self.func5Text = StringVar()
+        self.func5Text.set("Func 5")
         self.scriptbutton5 = ttk.Button(scriptframe,
-            text="Func 5", width=11,
+            textvariable=self.func5Text, width=11,
             command=lambda i=5: self.callCustomFunc(i),
         )
         self.scriptbutton5.pack(padx=5, pady=5, side=LEFT)                              
@@ -291,6 +306,14 @@ class Window(Frame):
         """ function to reload a script when changed """
 
         importlib.reload(self.devscript)
+        try:
+            self.func1Text.set(self.devscript.funcName[0])
+            self.func2Text.set(self.devscript.funcName[1])
+            self.func3Text.set(self.devscript.funcName[2])
+            self.func4Text.set(self.devscript.funcName[3])
+            self.func5Text.set(self.devscript.funcName[4])
+        except:
+            pass
         msg = "Script has been reloaded"
         self.terminalFunction("--", msg)
 
@@ -359,6 +382,14 @@ class Window(Frame):
                             except Exception as e:
                                 msg = "Script import failed: {}.py".format(e)
                                 self.terminalFunction("ER", msg)
+                            try:
+                                self.func1Text.set(self.devscript.funcName[0])
+                                self.func2Text.set(self.devscript.funcName[1])
+                                self.func3Text.set(self.devscript.funcName[2])
+                                self.func4Text.set(self.devscript.funcName[3])
+                                self.func5Text.set(self.devscript.funcName[4])
+                            except:
+                                pass
                         else:
                             self.devscript = None
             except Exception as e:

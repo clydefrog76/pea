@@ -44,6 +44,14 @@ def rxscript(conn, rx):
 ''' ***************************** '''
 ''' Custom functions from buttons '''
 ''' ***************************** '''  
+# Func names < 10 characters
+funcName = [
+    "Func A",
+    "Func B",
+    "Func C",
+    "Func D",
+    "Func E" ]
+  
 def customFunc(func):
     ''' Custom stuff in here func will be 1-6 '''
 
