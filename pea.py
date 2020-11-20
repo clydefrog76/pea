@@ -69,6 +69,7 @@ class Window(Frame):
         self.mySocket = None
         self.loop = None   
         self.LogModeActive = IntVar()
+        self.fname = None
 
         # menu bar section ----------------------------------------------------
 
@@ -307,7 +308,8 @@ class Window(Frame):
                     ("All files", "*.*"),
                 )
             )
-
+            
+            self.fname = fname
             path = os.path.dirname(os.path.abspath(fname))
             scriptName = os.path.basename(fname)[:-5]
             self.scriptName = scriptName
@@ -698,12 +700,15 @@ class Window(Frame):
                 self.querylist = self.querylist[:-1]
                 self.responselist = self.responselist[:-1]
 
-        def openFile():
+        def openFile(idx):
                 """ opens existing file """
 
                 root.wm_attributes('-topmost', 1)
-                fname = filedialog.askopenfilename(filetypes=(("Sim files", "*.json"), ("All files", "*.*") ))
-                
+                if idx == 1:
+                    fname = filedialog.askopenfilename(filetypes=(("Sim files", "*.json"), ("All files", "*.*") ))
+                else:
+                    fname = self.fname
+
                 """ Open the simulation json file """
                 try:
                     root.wm_attributes('-topmost', 0)
@@ -793,7 +798,7 @@ class Window(Frame):
         jsonmenu.add_cascade(label="File", menu=filemenu)
         filemenu.add_command(label="New File", command=newFile)
         filemenu.add_separator()
-        filemenu.add_command(label="Open Existing", command=openFile)
+        filemenu.add_command(label="Open Existing", command=lambda i=1: openFile(i))
         filemenu.add_command(label="Save To Disk", command=saveFile)
         filemenu.add_separator()
         filemenu.add_command(label="Exit Editor", command=on_jsoneditorclosing) 
@@ -880,6 +885,9 @@ class Window(Frame):
         scrolllabel.pack(pady=5)        
 
         spinnerFunction('new')
+
+        if self.fname:
+            openFile(2)
 
     def asciihexWindow(self):
         """ opens a new ASCII HEX window """
