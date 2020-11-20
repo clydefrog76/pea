@@ -392,6 +392,12 @@ class Window(Frame):
                                 pass
                         else:
                             self.devscript = None
+                            self.func1Text.set("Func 1")
+                            self.func2Text.set("Func 2")
+                            self.func3Text.set("Func 3")
+                            self.func4Text.set("Func 4")
+                            self.func5Text.set("Func 5")
+
             except Exception as e:
                 print("Error opening sim file:", e) 
 
