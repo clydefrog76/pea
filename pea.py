@@ -231,7 +231,7 @@ class Window(Frame):
         logmodecheckbox.pack(padx=5, pady=5, side=LEFT)
 
         spacerlabel = ttk.Label(terminalfuncframe, text="")
-        spacerlabel.pack(padx=179, pady=5, side=LEFT)        
+        spacerlabel.pack(padx=163, pady=5, side=LEFT)        
 
         self.linelabel = ttk.Label(terminalfuncframe, text="000000")
         self.linelabel.config(font=("consolas", 12))
