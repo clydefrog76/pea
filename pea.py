@@ -195,6 +195,10 @@ class Window(Frame):
         terminalfuncframe = ttk.LabelFrame(mainframe3, text="Terminal Functions",)
         terminalfuncframe.grid(row=0, column=0, padx=8, pady=8, sticky='nsew')
 
+        self.colorlabel2 = ttk.Label(terminalfuncframe, width=3, text="")
+        self.colorlabel2.pack(padx=5, pady=5, side=LEFT)
+        self.colorlabel2.config(background=self.colorList[0])  
+
         startbutton = ttk.Button(
             terminalfuncframe,
             text="Run",
@@ -342,6 +346,7 @@ class Window(Frame):
                             loadedManufacturer, loadedModel, loadedDelay
                         )
                         self.terminalFunction("--", msg)
+                        self.runstopFunction(1)
 
                         if data[6]["Script"]:  # If a script is specified then also open that
                             msg = "Importing Script file: {}.py".format(scriptName)
@@ -446,8 +451,10 @@ class Window(Frame):
 
         if index == 1:
             self.terminalrunning = True
+            self.colorlabel2.config(background=app.colorList[1])
         else:
             self.terminalrunning = False
+            self.colorlabel2.config(background=app.colorList[0])
 
         self.terminallengthFunction()
 
@@ -1073,7 +1080,7 @@ feel free to donate ANY amount you like, big or small to:"""
 
         elif self.portopen == True:
             msg = "Port is closed"
-            self.terminalFunction("--", msg)            
+            self.terminalFunction("--", msg)  
 
             self.portentry.config(state="normal")
             self.portbutton.config(text="Open Port")
