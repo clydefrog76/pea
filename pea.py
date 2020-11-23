@@ -401,6 +401,10 @@ class Window(Frame):
                             self.func4Text.set("Func 4")
                             self.func5Text.set("Func 5")
 
+                        for idx,cmd in enumerate(self.commandsList[7]): # converts all query and response loaded to bytes
+                            self.commandsList[7][idx]['Query'] = cmd['Query'].encode("latin-1").decode("unicode_escape").encode("latin-1")
+                            self.commandsList[7][idx]['Response'] = cmd['Response'].encode("latin-1").decode("unicode_escape").encode("latin-1")                                 
+
             except Exception as e:
                 print("Error opening sim file:", e) 
 
@@ -1150,18 +1154,10 @@ class SocketServer(asyncio.Protocol):
         app.disconnectbutton.config(state="active")
 
         if app.commandsList:
-            if "ON_CONNECT" in app.commandsList[7][0]["Query"]:
-                byteresponse = "{}".format(
-                    app.commandsList[7][0]["Response"]
-                )
-                byteresponsesend = (
-                    byteresponse.encode("latin-1")
-                    .decode("unicode_escape")
-                    .encode("latin-1")
-                )
-                app.terminalFunction("OU", byteresponsesend)
+            if b'ON_CONNECT' in app.commandsList[7][0]["Query"]:
+                app.terminalFunction("OU", app.commandsList[7][0]["Response"])
                 try:
-                    app.mySocket.write(byteresponsesend)
+                    app.mySocket.write(app.commandsList[7][0]["Response"])
                 except:
                     print('Error sending bytes')          
 
@@ -1171,29 +1167,15 @@ class SocketServer(asyncio.Protocol):
         self.idx = 0
 
         if app.commandsList:
-            result = any(
-                str(x["Query"])
-                .encode("latin-1")
-                .decode("unicode_escape")
-                .encode("latin-1")
-                == data
-                for self.idx, x in enumerate(app.commandsList[7])
-            )
+
+            result = any(x["Query"] == data for self.idx, x in enumerate(app.commandsList[7]))
 
             if result:  # command found in query
                 delay = float(app.commandsList[5]["Delay"])
-                byteresponse = "{}".format(
-                    app.commandsList[7][self.idx]["Response"]
-                )
                 time.sleep(delay)
-                byteresponsesend = (
-                    byteresponse.encode("latin-1")
-                    .decode("unicode_escape")
-                    .encode("latin-1")
-                )
-                app.terminalFunction("OU", byteresponsesend)
+                app.terminalFunction("OU", app.commandsList[7][self.idx]["Response"])
                 try:
-                    app.mySocket.write(byteresponsesend)
+                    app.mySocket.write(app.commandsList[7][self.idx]["Response"])
                 except:
                     pass
             else:  # command not found in query, trying script
