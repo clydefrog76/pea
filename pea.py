@@ -68,7 +68,8 @@ class Window(Frame):
         self.portopen = False
         self.mySocket = None
         self.loop = None   
-        self.LogModeActive = IntVar()
+        self.logmodeactive = IntVar()
+        self.showbytecount = IntVar()
         self.fname = None
 
         # menu bar section ----------------------------------------------------
@@ -239,15 +240,22 @@ class Window(Frame):
         )
         clearbutton.pack(padx=5, pady=5, side=LEFT) 
 
+        bytecountcheckbox = ttk.Checkbutton(
+            terminalfuncframe, 
+            text="Show Bytecount",
+            variable=self.showbytecount)
+
+        bytecountcheckbox.pack(padx=5, pady=5, side=LEFT)
+
         logmodecheckbox = ttk.Checkbutton(
             terminalfuncframe, 
             text="Log Mode",
-            variable=self.LogModeActive)
+            variable=self.logmodeactive)
 
-        logmodecheckbox.pack(padx=5, pady=5, side=LEFT)
+        logmodecheckbox.pack(padx=5, pady=5, side=LEFT)      
 
         spacerlabel = ttk.Label(terminalfuncframe, text="")
-        spacerlabel.pack(padx=163, pady=5, side=LEFT)        
+        spacerlabel.pack(padx=104, pady=5, side=LEFT)        
 
         self.linelabel = ttk.Label(terminalfuncframe, text="000000")
         self.linelabel.config(font=("consolas", 12))
@@ -460,6 +468,7 @@ class Window(Frame):
             msgdir = str(direction)
             now = datetime.datetime.now()
             msgnow = str(now.strftime("%H:%M:%S.%f")[:-3])
+            msglen = len(data)
             msgdata = str(data)
 
             if direction == "--" or direction == 'ER':  # info or error lines
@@ -476,7 +485,11 @@ class Window(Frame):
                     color = 3                    
                 else:
                     color = 4
-                msg = "{} | {} | {}\n".format(msgdir, msgnow, msgdata)
+                if app.showbytecount.get() == 0:
+                    msg = "{} | {} | {}\n".format(msgdir, msgnow, msgdata)
+                else:
+                    msg = "{} | {} | {} | {}\n".format(msgdir, msgnow, msgdata, msglen)
+
                 self.terminalbox.tag_config(str(self.colorList[color]), foreground=self.colorList[color])
                 self.terminalbox.insert(END, msg, str(self.colorList[color]))
                 self.terminalbox.see(END)
@@ -1162,7 +1175,6 @@ class SocketServer(asyncio.Protocol):
                     print('Error sending bytes')          
 
     def data_received(self, data):
-        print('data',data)
         app.terminalFunction("IN", data) 
 
         self.idx = 0
@@ -1206,7 +1218,7 @@ class SocketServer(asyncio.Protocol):
                             print('Exception occured in sending', e)
 
                 else:  # Nothing found in query
-                    if app.LogModeActive.get() == 0:
+                    if app.logmodeactive.get() == 0:
                         byteresponse = "Error - no match found with query"
                         app.terminalFunction("ER", byteresponse)
                         app.mySocket.write(bytes(byteresponse, "utf-8"))
