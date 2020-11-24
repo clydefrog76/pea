@@ -1162,6 +1162,7 @@ class SocketServer(asyncio.Protocol):
                     print('Error sending bytes')          
 
     def data_received(self, data):
+        print('data',data)
         app.terminalFunction("IN", data) 
 
         self.idx = 0
