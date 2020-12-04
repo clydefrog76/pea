@@ -367,8 +367,6 @@ class Window(Frame):
                     loadedDelay = ""
 
                     if data:
-                        self.commandsList = data
-
                         loadedManufacturer = data[0]["Manufacturer"]
                         loadedModel = data[1]["Model"]
                         loadedPort = data[4]["Port"]
@@ -410,9 +408,7 @@ class Window(Frame):
                             self.func4Text.set("Func 4")
                             self.func5Text.set("Func 5")
 
-                        for idx,cmd in enumerate(self.commandsList[7]): # converts all query and response loaded to bytes
-                            self.commandsList[7][idx]['Query'] = cmd['Query'].encode("latin-1").decode("unicode_escape").encode("latin-1")
-                            self.commandsList[7][idx]['Response'] = cmd['Response'].encode("latin-1").decode("unicode_escape").encode("latin-1")                                 
+                        self.updateCommandsList(data)
 
             except Exception as e:
                 print("Error opening sim file:", e) 
@@ -433,14 +429,18 @@ class Window(Frame):
                     data = json.load(data_file)
 
                     if data:
-                        self.commandsList = data
-
-                        for idx,cmd in enumerate(self.commandsList[7]): # converts all query and response loaded to bytes
-                            self.commandsList[7][idx]['Query'] = cmd['Query'].encode("latin-1").decode("unicode_escape").encode("latin-1")
-                            self.commandsList[7][idx]['Response'] = cmd['Response'].encode("latin-1").decode("unicode_escape").encode("latin-1")                                 
+                        self.updateCommandsList(data)
 
             except Exception as e:        
                 print("Error opening sim file:", e) 
+
+    def updateCommandsList(self, data):
+
+        self.commandsList = data
+
+        for idx,cmd in enumerate(self.commandsList[7]): # converts all query and response loaded to bytes
+            self.commandsList[7][idx]['Query'] = cmd['Query'].encode("latin-1").decode("unicode_escape").encode("latin-1")
+            self.commandsList[7][idx]['Response'] = cmd['Response'].encode("latin-1").decode("unicode_escape").encode("latin-1")                                 
 
     def disconnectFunction(self):
         """ pressed on the disconnect button """
