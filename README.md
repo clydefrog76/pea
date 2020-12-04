@@ -14,3 +14,5 @@ As an addition, PEA has the possibility to use a python script for more complica
 Included in PEA are several tools to aid in your coding such as a hex-ascii converter and ascii tables.
 
 Please use the HELP popup for a more precise description of the individual features.
+
+http://www.thecontentpeople.nl
