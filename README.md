@@ -14,3 +14,7 @@ As an addition, PEA has the possibility to use a python script for more complica
 Included in PEA are several tools to aid in your coding such as a hex-ascii converter and ascii tables.
 
 Please use the HELP popup for a more precise description of the individual features.
+
+To install pea either download the zip or use git clone. Using git clone will allow easy updates and you can even help contribute to the project with features and improvements.
+
+See this video for a quick git clone how-to: https://youtu.be/AlBA65jwa3g
