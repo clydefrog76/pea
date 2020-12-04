@@ -35,7 +35,7 @@
             "Description": "bytes command",
             "Query": "\\x81\\x8a\\x8b\\x00",
             "Response": "\\x63\\x6f\\x72\\x72\\x65\\x63\\x74"
-        },        
+        },
         {
             "Description": "ascii command",
             "Query": "ascii\r",

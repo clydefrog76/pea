@@ -1050,7 +1050,42 @@ class Window(Frame):
         howtoFrame = VerticalScrolledFrame(howtoWindow) 
         howtoFrame.pack(expand=1, fill=BOTH)
         
-        from help import howtomsg
+        howtomsg = '''How to use PEA
+
+Here are the steps required to create a working
+TCP emulator using PEA:
+
+1) Obtain the protocol for the device you need to emulate
+2) Establish the TCP Port number NOT lower than 1024
+3) Open the JSON editor entering all the device details
+4) To add a new command line increase the number of commands
+5) Add a description, query & response. Use this format
+
+    ascii: hello\\r\\n
+    ascii and hex: hello\\x0a\\x0d
+    hex: \\x35\\x75\\x0d\\x0a
+
+This method allows simple protocols to be quickly and easily
+created using JSON only. If you need more complex responses, such
+as feedback from a switcher with changing values, then use an
+associated python script to deal with more complex requirements.
+
+To enable an associated script check the Script? box in the JSON
+editor and then create (in the same folder) a .py file with the
+same filename as the JSON file. This will be automatically loaded
+if the checkbox is ticked.
+
+If you have modified the JSON or Script file you need to use the
+appropiate Reload menu option to update the emulator.
+
+Be aware that the Reload JSON only reloads the TCP query commands
+and not the connection details. If you change one of the other
+details such as Port number, Script checkbox or the Delay you need
+to use the Browse for Emulator JSON File menu option again.
+
+Look at the example template JSON and PY Script for more details
+on how to deal with received and send strings.'''
+
         howtoText = ttk.Label(howtoFrame.interior, text=howtomsg)
         howtoText.config(font=("consolas", 10))             
         howtoText.pack(padx=8, pady=8)
@@ -1075,12 +1110,14 @@ class Window(Frame):
         pealogo = PhotoImage(file='assets/logo.gif')
         aboutCanvas.pealogo = pealogo
         aboutCanvas.create_image((10, 10), anchor='nw', image=pealogo)
+
         aboutmsg = """PEA: a python written tcp ethernet device emulator  \n
 Version: 1.0.0
 Python Version: 3.8.5\n
 Github Repo: https://github.com/clydefrog76/pea\n
 Programmers: Alexander Teusch
              Rupert Powell"""
+
         aboutCanvas.create_text(10, 150, anchor='nw', font=("Consolas", 10), text=aboutmsg)  
 
     def donationsWindow(self):
@@ -1100,11 +1137,13 @@ Programmers: Alexander Teusch
 
         donationsCanvas = Canvas(donationsWindow, width=0, height=0)
         donationsCanvas.pack(expand=YES, fill=BOTH)
+
         donationsmsg = """Although PEA is free, fully open-source and built with the community
 in mind, we the developers still have spend dozends of hours in\ncreating and testing this tool.\n
 If you like this great tool and you wish to support us and contribute
 to future improvents, updates or even just some beer money, please
 feel free to donate ANY amount you like, big or small to:"""
+
         donationsCanvas.create_text(15, 15, anchor='nw', font=("Consolas", 10), text=donationsmsg)     
         donationsCanvas.create_text(15, 150, anchor='nw', font=("Consolas", 10), text='PayPal:', fill='blue')
         donationsCanvas.create_text(85, 150, anchor='nw', font=("Consolas", 10), text='alexander.teusch@runbox.com')
