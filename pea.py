@@ -1275,8 +1275,9 @@ class SocketServer(asyncio.Protocol):
                         app.mySocket.write(byteresponsesend)
                         app.terminalFunction("OU", byteresponsesend)
                     else:  # Nothing found in query or script
-                        byteresponse = "Error - no match found in query or script"
-                        app.terminalFunction("ER", byteresponse)
+                        if app.logmodeactive.get() == 0:
+                            byteresponse = "Error - no match found in query or script"
+                            app.terminalFunction("ER", byteresponse)
                         try:
                             app.mySocket.write(bytes(byteresponse, "utf-8"))
                         except Exception as e:
