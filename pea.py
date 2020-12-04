@@ -83,6 +83,7 @@ class Window(Frame):
 
         editmenu = Menu(menubar, tearoff=0)
         editmenu.add_command(label="Emulator JSON Editor", command=self.jsoneditorWindow)
+        editmenu.add_command(label="Reload JSON", command=self.reloadJSON)
         editmenu.add_separator()
         editmenu.add_command(label="Emulator Script Editor", command=self.launchScriptEditor)
         editmenu.add_command(label="Reload Script", command=self.reloadScript)
@@ -414,6 +415,31 @@ class Window(Frame):
                             self.commandsList[7][idx]['Response'] = cmd['Response'].encode("latin-1").decode("unicode_escape").encode("latin-1")                                 
 
             except Exception as e:
+                print("Error opening sim file:", e) 
+
+    def reloadJSON(self):
+        """ pressed on the reload JSON button """
+
+        if self.fname:
+            try:
+                msg = "Reloading JSON commands from {}".format(self.fname)
+                self.terminalFunction("--", msg)
+            except:
+                print("Failed to read file\n'%s'" % self.fname)
+
+            """ Open the simulation json file """
+            try:
+                with open(self.fname) as data_file:
+                    data = json.load(data_file)
+
+                    if data:
+                        self.commandsList = data
+
+                        for idx,cmd in enumerate(self.commandsList[7]): # converts all query and response loaded to bytes
+                            self.commandsList[7][idx]['Query'] = cmd['Query'].encode("latin-1").decode("unicode_escape").encode("latin-1")
+                            self.commandsList[7][idx]['Response'] = cmd['Response'].encode("latin-1").decode("unicode_escape").encode("latin-1")                                 
+
+            except Exception as e:        
                 print("Error opening sim file:", e) 
 
     def disconnectFunction(self):
