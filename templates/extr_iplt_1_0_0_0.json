@@ -1,0 +1,40 @@
+[
+    {
+        "Manufacturer": "Extron"
+    },
+    {
+        "Model": "IPL T CR48"
+    },
+    {
+        "Category": "Relay Input Interface"
+    },
+    {
+        "Version": "1_0_0_0"
+    },
+    {
+        "Port": 1024
+    },
+    {
+        "Delay": 0.2
+    },
+    {
+        "Script": true
+    },
+    [
+        {
+            "Description": "ON_CONNECT",
+            "Query": "ON_CONNECT",
+            "Response": "\r\n(c) COPYRIGHT 2009, EXTRON ELECTRONICS IPL T CR48, Vx.xx, 60-544-x5\r\nTue, 10 Aug 2010 16:29:10\r\n"
+        },
+        {
+            "Description": "Query Firmware Version",
+            "Query": "Q",
+            "Response": "1.2\r\n"
+        },
+        {
+            "Description": "Part Number",
+            "Query": "n",
+            "Response": "Pno60-544-05\r\n"
+        }
+    ]
+]
