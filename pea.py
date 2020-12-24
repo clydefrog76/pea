@@ -1265,24 +1265,25 @@ class SocketServer(asyncio.Protocol):
                         )
                     except Exception as e:
                         print('Exception occured in devscript', e)
-
-                    if byteresponse:
-                        byteresponsesend = (
-                            byteresponse.encode("latin-1")
-                            .decode("unicode_escape")
-                            .encode("latin-1")
-                        )
-                        app.mySocket.write(byteresponsesend)
-                        app.terminalFunction("OU", byteresponsesend)
-                    else:  # Nothing found in query or script
-                        if app.logmodeactive.get() == 0:
-                            byteresponse = "Error - no match found in query or script"
-                            app.terminalFunction("ER", byteresponse)
-                        try:
-                            app.mySocket.write(bytes(byteresponse, "utf-8"))
-                        except Exception as e:
-                            print('Exception occured in sending', e)
-
+                    try:
+                        if byteresponse:
+                            byteresponsesend = (
+                                byteresponse.encode("latin-1")
+                                .decode("unicode_escape")
+                                .encode("latin-1")
+                            )
+                            app.mySocket.write(byteresponsesend)
+                            app.terminalFunction("OU", byteresponsesend)
+                        else:  # Nothing found in query or script
+                            if app.logmodeactive.get() == 0:
+                                byteresponse = "Error - no match found in query or script"
+                                app.terminalFunction("ER", byteresponse)
+                            try:
+                                app.mySocket.write(bytes(byteresponse, "utf-8"))
+                            except Exception as e:
+                                print('Exception occured in sending', e)
+                    except:
+                        app.terminalFunction("ER", 'Script ERROR!')
                 else:  # Nothing found in query
                     if app.logmodeactive.get() == 0:
                         byteresponse = "Error - no match found with query"
