@@ -19,4 +19,4 @@ To install pea either download the zip or use git clone. Using git clone will al
 
 See this video for a quick git clone how-to: https://youtu.be/DmbzwYdzh3M
 
-![Screenshot](assets/screenshot.png)
+![Screenshot](assets/Screenshot.PNG)
