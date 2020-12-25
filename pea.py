@@ -1167,7 +1167,7 @@ Programmers: Alexander Teusch
         donationsmsg = """Although PEA is free, fully open-source and built with the community
 in mind, we the developers still have spend dozends of hours in\ncreating and testing this tool.\n
 If you like this great tool and you wish to support us and contribute
-to future improvents, updates or even just some beer money, please
+to future improvements, updates or even just some beer money, please
 feel free to donate ANY amount you like, big or small to:"""
 
         donationsCanvas.create_text(15, 15, anchor='nw', font=("Consolas", 10), text=donationsmsg)     
