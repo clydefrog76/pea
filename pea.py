@@ -58,6 +58,7 @@ class Window(Frame):
         """ declare the main window for gui drawing """
 
         self.master.title("PEA - Python Emulator for Audiovisual devices")
+        #self.master.iconbitmap(r'assets/icon.png') 
         self.pack(fill=BOTH, expand=1)
         self.colorList = ["#FF0000", "#00FF00", "#DDEEFF", "#009900", "#000099"]
         self.terminalrunning = True
