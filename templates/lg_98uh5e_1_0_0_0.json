@@ -1,0 +1,30 @@
+[
+    {
+        "Manufacturer": "LG"
+    },
+    {
+        "Model": "98UH5E"
+    },
+    {
+        "Category": "Display"
+    },
+    {
+        "Version": "1_0_0_0"
+    },
+    {
+        "Port": 9761
+    },
+    {
+        "Delay": 0.1
+    },
+    {
+        "Script": true
+    },
+    [
+        {
+            "Description": "ON_CONNECT",
+            "Query": "ON_CONNECT",
+            "Response": "e"
+        }
+    ]
+]
