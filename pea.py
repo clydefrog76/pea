@@ -840,8 +840,8 @@ class Window(Frame):
             """ saves current file """
 
             if manufacturerentry.get() and modelentry.get() and categoryentry.get() and jsonportentry.get() and self.commandlist[0].get()\
-                and self.querylist[0].get() and self.responselist[0].get():
-                
+                and self.querylist[0].get():
+               
                 manu = str(manufacturerentry.get())[:4].lower().replace(" ", "")
                 mode = str(modelentry.get())[:6].lower().replace(" ", "")
                 vers = str(versionentry.get())                
