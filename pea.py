@@ -785,56 +785,56 @@ class Window(Frame):
                 self.responselist = self.responselist[:-1]
 
         def openFile(idx):
-                """ opens existing file """
+            """ opens existing file """
 
-                root.wm_attributes('-topmost', 1)
-                if idx == 1:
-                    fname = filedialog.askopenfilename(filetypes=(("Sim files", "*.json"), ("All files", "*.*") ))
-                else:
-                    fname = self.fname
+            root.wm_attributes('-topmost', 1)
+            if idx == 1:
+                fname = filedialog.askopenfilename(filetypes=(("Sim files", "*.json"), ("All files", "*.*") ))
+            else:
+                fname = self.fname
 
-                """ Open the simulation json file """
-                try:
-                    root.wm_attributes('-topmost', 0)
-                    with open(fname) as data_file:    
-                        data = json.load(data_file)
+            """ Open the simulation json file """
+            try:
+                root.wm_attributes('-topmost', 0)
+                with open(fname) as data_file:    
+                    data = json.load(data_file)
 
-                        if data:
-                            newFile()   
-                            versionentry.delete(0, END)
-                            delayentry.delete(0, END)
-                            self.commandlist[0].delete(0, END)
-                            self.querylist[0].delete(0, END)
-                            self.responselist[0].delete(0, END)                                                      
+                    if data:
+                        newFile()   
+                        versionentry.delete(0, END)
+                        delayentry.delete(0, END)
+                        self.commandlist[0].delete(0, END)
+                        self.querylist[0].delete(0, END)
+                        self.responselist[0].delete(0, END)                                                      
+                        
+                        fileentry.insert(0, str(fname))
+                        manufacturerentry.insert(0, str(data[0]['Manufacturer']))
+                        modelentry.insert(0, str(data[1]['Model']))
+                        categoryentry.insert(0, str(data[2]['Category']))
+                        versionentry.insert(0, str(data[3]['Version']))
+                        jsonportentry.insert(0, int(data[4]['Port']))
+                        delayentry.insert(0, float(data[5]['Delay']))
+                        scriptbool.set(data[6]['Script'])   
+                        spinnerbox.set(str(len(data[7])))
+
+                        for idx,data in enumerate(data[7]):
+                            cmd = data['Description']
+                            que = data['Query'].encode('unicode-escape').decode()
+                            res = data['Response'].encode('unicode-escape').decode()
                             
-                            fileentry.insert(0, str(fname))
-                            manufacturerentry.insert(0, str(data[0]['Manufacturer']))
-                            modelentry.insert(0, str(data[1]['Model']))
-                            categoryentry.insert(0, str(data[2]['Category']))
-                            versionentry.insert(0, str(data[3]['Version']))
-                            jsonportentry.insert(0, int(data[4]['Port']))
-                            delayentry.insert(0, float(data[5]['Delay']))
-                            scriptbool.set(data[6]['Script'])   
-                            spinnerbox.set(str(len(data[7])))
+                            if idx == 0:
+                                self.commandlist[0].insert(0, cmd)
+                                self.querylist[0].insert(0, que.replace(r'\\x', r'\x'))
+                                self.responselist[0].insert(0, res.replace(r'\\x', r'\x'))                          
+                            else:
+                                appendCommands()
+                                self.commandlist[idx].insert(0, cmd)
+                                self.querylist[idx].insert(0, que.replace(r'\\x', r'\x'))
+                                self.responselist[idx].insert(0, res.replace(r'\\x', r'\x'))                          
 
-                            for idx,data in enumerate(data[7]):
-                                cmd = data['Description']
-                                que = data['Query'].encode('unicode-escape').decode()
-                                res = data['Response'].encode('unicode-escape').decode()
-                                
-                                if idx == 0:
-                                    self.commandlist[0].insert(0, cmd)
-                                    self.querylist[0].insert(0, que.replace(r'\\x', r'\x'))
-                                    self.responselist[0].insert(0, res.replace(r'\\x', r'\x'))                          
-                                else:
-                                    appendCommands()
-                                    self.commandlist[idx].insert(0, cmd)
-                                    self.querylist[idx].insert(0, que.replace(r'\\x', r'\x'))
-                                    self.responselist[idx].insert(0, res.replace(r'\\x', r'\x'))                          
-
-                except Exception as e:
-                    print('Error opening sim file:',e)
-                    root.wm_attributes('-topmost', 0)                 
+            except Exception as e:
+                print('Error opening sim file:',e)
+                root.wm_attributes('-topmost', 0)                 
 
         def saveFile():
             """ saves current file """
