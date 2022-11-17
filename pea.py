@@ -479,8 +479,11 @@ class Window(Frame):
 
             if byteresponse and self.mySocket:
                 byteresponsesend = (byteresponse.encode("latin-1").decode("unicode_escape").encode("latin-1"))
-                self.terminalFunction("OU", byteresponsesend)
-                self.mySocket.write(byteresponsesend)
+                if "$$$" in byteresponse:
+                    self.terminalFunction("FB", byteresponsesend[3:])    
+                else:
+                    self.terminalFunction("OU", byteresponsesend)
+                    self.mySocket.write(byteresponsesend)
             else:
                 msg = "No TCP connection detected"
                 self.terminalFunction("--", msg)                           
